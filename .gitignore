@@ -1,0 +1,9 @@
+*.Rproj.user
+*.Rhistory
+*.Ruserdata
+*.png
+*.pdf
+*.svg
+.Rproj.user
+cache/*
+figures/*
