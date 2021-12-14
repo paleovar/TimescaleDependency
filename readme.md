@@ -4,3 +4,15 @@ This repository will provide the code to reproduce the analysis carried out in t
 
 Authors: Beatrice Ellerhoff and Kira Rehfeld 
 Contact: beatrice.ellerhoff(at)iup.uni-heidelberg.de
+
+
+required packages:
+- dplyr
+- tibble
+- tidyr
+- zoo
+- RColorBrewer
+- ggplot2
+- latex2exp
+- cowplot
+- forcats
