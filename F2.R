@@ -19,10 +19,10 @@ full_plot1 <- gmspectra %>% unnest(data) %>%
   geom_abline(intercept = c(-5, -0.5), slope = c(-1, -2), lty=2, size=0.2) +
   geom_ribbon(alpha=0.1, aes(x = 1/freq, ymin=lim.1, ymax=lim.2, fill=signal)) +
   geom_ribbon(data=mean_df, alpha=0.1, aes(x = 1/freq, ymin=lim.1, ymax=lim.2, fill="mean")) +
-  geom_line(size=pointsize-0.3, aes(x = 1/freq, y = spec, color=signal))  +
+  geom_line(size=pointsize, aes(x = 1/freq, y = spec, color=signal))  +
   scale_color_manual(values = cut_colors) +
   guides(fill=FALSE) +
-  geom_line(data=mean_df, aes(x=1/freq,y=spec), color='black',size=pointsize-0.3) +
+  geom_line(data=mean_df, aes(x=1/freq,y=spec), color='black',size=pointsize) +
   scale_fill_manual(values=cut_colors) + 
   theme(legend.position="none") +
   annotate("text", x = c(0.02, 20), y=c(0.01, 0.00003), label = c("β=2", "β=1"), size=notationsize) +
@@ -67,10 +67,10 @@ full_plot2 <- lmspectra %>% unnest(data) %>%
   scale_x_continuous(trans=reverselog_trans(10), breaks = yrs.period, labels = yrs.labels, limits=c(1e3, 1e-3), expand=c(0.0, 0.), name=TeX('\\textbf{period} / $yrs$'), sec.axis = dup_axis(name = NULL, labels = NULL)) +
   geom_ribbon(alpha=0.3, aes(x = 1/freq, ymin=lim.1, ymax=lim.2, fill=signal)) +
   geom_ribbon(data=lmspectra_mean_df, alpha=0.3, aes(x = 1/freq, ymin=lim.1, ymax=lim.2, fill="mean")) +
-  geom_line(size=pointsize-0.3, aes(x = 1/freq, y = spec, color=signal))  +
+  geom_line(size=pointsize, aes(x = 1/freq, y = spec, color=signal))  +
   scale_color_manual(values = cut_colors) +
   guides(fill=FALSE) +
-  geom_line(data=lmspectra_mean_df, aes(x=1/freq,y=spec), color='black',size=pointsize-0.3) +
+  geom_line(data=lmspectra_mean_df, aes(x=1/freq,y=spec), color='black',size=pointsize) +
   scale_fill_manual(values=cut_colors) + #
   annotate("text", x = c(0.02, 5), y=c(10, 0.0003), label = c("β=2", "β=1"), size=notationsize) +
   annotate("text",x = c(500), y=c(500), label = c("(a)"), size=notationsize) +
@@ -97,4 +97,3 @@ plot_main <- cowplot::plot_grid(
 )
 
 print(plot_main)
-
