@@ -72,3 +72,32 @@ plot_spec <- function(tibble, ylims, xlims, name.y=TeX('PSD $S(\\tau)\\,(K^2 yr)
         scale_x_continuous(trans=reverselog_trans(10), breaks = yrs.period, labels = yrs.labels, name=name.x,expand=c(0.0, 0.0), limits=xlims, sec.axis = dup_axis(name = NULL, labels = NULL)) 
     }
 
+#--------------------------------------------------------------#
+
+GetVar <- function (spec, f, dfreq = NULL, df.log = 0, bw = 3) 
+{
+  if (f[1] >= f[2]) 
+    stop("f1 must be < f2")
+  freqVector <- spec$freq
+  if (f[1] < FirstElement(freqVector)) {
+    warning("f[1] is smaller than the lowest frequency in the spectrum, set to the lowest frequency")
+    f[1] <- FirstElement(freqVector)
+  }
+  if (f[2] > LastElement(freqVector)) {
+    warning("f[2] is larger than the highest frequency in the spectrum, set to the highest frequency")
+    f[2] <- LastElement(freqVector)
+  }
+  Intp <- function (freqRef, spec) 
+  {
+    result <- list()
+    result$freq <- freqRef
+    result$spec <- approx(spec$freq, spec$spec, freqRef)$y
+    class(result) <- "spec"
+    return(result)
+  }
+  if (is.null(dfreq)) 
+    dfreq <- min(diff(spec$freq)[1]/5, (f[2] - f[1])/100)
+  newFreq <- seq(from = f[1], to = f[2], by = dfreq)
+  vars <- mean(Intp(newFreq, spec)$spec)
+  return(vars)
+}
