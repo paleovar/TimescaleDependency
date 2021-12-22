@@ -3,19 +3,6 @@ source("helpers/functions.R")
 
 l <- readRDS("data/transfer.Rds")
 
-plot_spec(l, ylims=c(0.001, 1), xlims=c(370, 2.1))
-
-plot_spec <- function(tibble, ylims, xlims, name.y=TeX('PSD $S(\\tau)\\,(K^2 yr)$ '), name.x=TeX('period $\\tau (yr)$'), name.data = "data"){
-    yrs.period <- rev(c(0.0001, 0.001, 0.01,  0.1, 1, 10, 100, 1000, 10000, 100000, 1000000))
-    yrs.labels <- rev(c(TeX('$10^{-4}$'),TeX('$10^{-3}$'), TeX('$10^{-2}$'), TeX('$10^{-1}$'), TeX('$10^{0}$'), TeX('$10^{1}$'), TeX('$10^{2}$'), TeX('$10^{3}$'), TeX('$10^{4}$'), TeX('$10^{5}$'), TeX('$10^{6}$')))
-    tibble %>% unnest(name.data) %>%
-        ggplot(aes(x = 1/freq, y = spec, color=signal)) +
-        geom_ribbon(alpha=0.2, aes(ymin=lim.1, ymax=lim.2, fill=signal), linetype = 0) + guides(fill=FALSE) +
-        geom_line(size=0.4) + theme_td() +
-        scale_y_log10(name=name.y, label = scales::trans_format("log10", scales::math_format(10^.x)), expand=c(0.0, 0.0), limits=ylims, sec.axis = dup_axis(name = NULL, labels = NULL))  +
-        scale_x_continuous(trans=reverselog_trans(10), breaks = yrs.period, labels = yrs.labels, name=name.x,expand=c(0.0, 0.0), limits=xlims, sec.axis = dup_axis(name = NULL, labels = NULL)) 
-    }
-
 sample_gain <- l %>% rename(lim.1=sd_down, lim.2=sd_up, signal=name, spec=m) %>% group_by(signal) %>% nest() %>% 
   plot_spec(ylims=c(0.001, 1), xlims=c(370, 2.1),name.y=TeX('gain G^2 ($\\tau$) ($K^2/(W^2 m^{-4})$)')) + 
           geom_hline(aes(x=1/freq, yintercept=var, color=signal), linetype="dashed") +

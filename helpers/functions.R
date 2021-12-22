@@ -101,3 +101,10 @@ GetVar <- function (spec, f, dfreq = NULL, df.log = 0, bw = 3)
   vars <- mean(Intp(newFreq, spec)$spec)
   return(vars)
 }
+
+#--------------------------------------------------------------#
+
+colorRampAlpha <- function(..., n, alpha) {
+  colors <- colorRampPalette(...)(n)
+  paste(colors, sprintf("%x", ceiling(255*alpha)), sep="")
+}
