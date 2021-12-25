@@ -15,5 +15,13 @@ required packages:
 - RColorBrewer
 - ggplot2
 - latex2exp
+
+Plotting some of the figures additionally requires:
 - cowplot
 - forcats
+- ggnewscale
+- rgdal (in case you encounter difficulties in the installation, this post might help: https://gist.github.com/dncgst/111b74066eaea87c92cdc5211949cd1e)
+- sp
+- sf (in case you encounter difficulties, this link might be useful: https://r-spatial.github.io/sf/)
+- viridisLite
+- raster
