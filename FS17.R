@@ -1,4 +1,5 @@
 source("helpers/init.R")
+source("helpers/functions.R")
 library(nest)
 
 pages.prxlist <- readRDS("data/proxylist.Rds")
