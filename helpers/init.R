@@ -4,6 +4,7 @@ library(ggplot2)
 library(tidyr)
 library(latex2exp)
 library(scales)
+library(tseries)
 
 signal_tbb <- readRDS("helpers/signal_tbb.Rds")
 model <- c(signal_tbb %>% filter(type=="model") %>% select(signal))$signal

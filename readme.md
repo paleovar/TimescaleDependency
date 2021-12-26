@@ -15,8 +15,9 @@ required packages:
 - RColorBrewer
 - ggplot2
 - latex2exp
+- tseries
 
-Plotting some of the figures additionally requires:
+Creating some of the figures requires:
 - cowplot
 - forcats
 - ggnewscale
@@ -25,3 +26,5 @@ Plotting some of the figures additionally requires:
 - sf (in case you encounter difficulties, this link might be useful: https://r-spatial.github.io/sf/)
 - viridisLite
 - raster
+- ggcorrplot
+- nest
