@@ -5,11 +5,16 @@ library(tidyr)
 library(latex2exp)
 library(scales)
 library(tseries)
+select <- dplyr::select
 
 signal_tbb <- readRDS("helpers/signal_tbb.Rds")
 model <- c(signal_tbb %>% filter(type=="model") %>% select(signal))$signal
 obs <- c(signal_tbb %>% filter(type=="obs") %>% select(signal))$signal
 signal <- c(model, obs)
+interp.res <- c(2/12, 2/12, 1/(gregorian_year*3), 2/12, 2/12, 1/(gregorian_year*3),  2/12, 2/12,  2/12, 4/12, 10, 4/12, 2/12, 1/(gregorian_year*3), 2/12, 1)
+meta.res <- data.frame(signal=signal, interp.res=interp.res)
+meta.res_tbb <- tibble(signal=as.character(signal), interp.res=interp.res) 
+gregorian_year <- 365.2425
 
 #graphical parameters
 pointsize=0.4

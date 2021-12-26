@@ -126,3 +126,101 @@ ltot <- function(list_spec_obj){
   }
   return(df)
 }
+
+#--------------------------------------------------------------#
+
+equidistant <- function(y){
+  cnt <- 0
+  y_equi <- y %>% add_column(EquiTS =
+                               .$data %>% lapply(., function(x){
+                                 cnt <<- cnt+1
+                                 tmp <- x %>% as_tibble() 
+                                 tmpdf <- list() 
+                                 for (i in names(tmp)){
+                                   if(i=="time"|i=="year"){next}
+                                   tmpdf[[i]] <- MakeEquidistant(tmp$time, tmp[[i]], dt = y$interp.res[cnt])
+                                 }
+                                 tmpdf %>% as_tibble()
+                               }
+                               )
+  ) #%>% select(model, interp.res, EquiTS)
+  return(y_equi)
+}
+
+#--------------------------------------------------------------#
+tibble_spec <- function(y, k, nw){
+  cnt <- 0
+  y_spec <- y %>% add_column(Spec =
+                               .$EquiTS %>% lapply(., function(x){
+                                 cnt <<- cnt+1
+                                 tmp <- x %>% as_tibble() 
+                                 tmpdf <- list() 
+                                 for (i in names(tmp)){
+                                   target <- tmp[[i]]
+                                   if(any(is.na(tmp[[i]]))){
+                                     if("model" %in% names(y)){
+                                       print(paste0(y$model[[cnt]], " ", i, " contains NA values, which were removed"))
+                                       target = na.remove(tmp[[i]])
+                                     }
+                                     if("Name" %in% names(y)){
+                                       print(paste0(y$Name[[cnt]], " ", i, " contains NA values, which were removed"))
+                                       target = na.remove(tmp[[i]])
+                                     }
+                                   }
+                                   target <- target - mean(target)
+                                   restmp <- SpecMTM(target, k=k, nw=nw, detrend=TRUE)
+                                   tmpdf[[i]] <- restmp$spec
+                                 } 
+                                 tmpdf[["freq"]] <- restmp$freq
+                                 tmpdf[["dof"]] <- restmp$dof
+                                 tmpdf %>% as_tibble()
+                               }
+                               )
+  ) #%>% select(model, interp.res, Spec)
+  return(y_spec)
+}
+
+tibble_to_list <- function(tibble_spec_obj){
+  tmp <- as.list(tibble_spec_obj)
+  #names(tmp$Spec) <- tmp$model
+  tmp$model <- NULL
+  tmp$interp.res <- NULL
+  lapply(tmp$Spec, function(x){
+    x <- as.list(x)
+    if ("temp" %in% names(x)){
+      x$spec <- x$temp
+      x$temp <- NULL
+    }
+    if ("dR" %in% names(x)){
+      x$spec <- x$dR
+      x$dR <- NULL
+    }
+    x$temp <- NULL
+    class(x) <- "spec"
+    return(x)
+  }
+  )
+}
+
+
+list_to_tibble <- function(list_spec_obj){
+  
+  df <- tibble(model=character(), data=list()) 
+  
+  for (i in 1:length(list_spec_obj)){
+    
+    if(class(list_spec_obj[[i]])=="zoo"){
+      time <- index(list_spec_obj[[i]]) #convert to CE
+      temp <- coredata(list_spec_obj[[i]])
+      list_spec_obj[[i]] <- list(time=time, temp=temp)
+    }
+    
+    class(list_spec_obj[[i]]) <- "list"
+    
+    df <- df %>% add_row(
+      model = names(list_spec_obj)[[i]], 
+      data = list_spec_obj[[i]] %>% as.data.frame() %>% as_tibble() %>% list()
+    )
+  }
+  return(df)
+}
