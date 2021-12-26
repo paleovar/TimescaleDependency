@@ -1,6 +1,6 @@
 Coming soon. 
 
-This repository will provide the code to reproduce the analysis carried out in the preprint https://arxiv.org/abs/2102.00458, accepted in Physical Review E (2021). 
+This repository provides code to reproduce the figures of "Probing the timescale dependency of local and global variations in surface air temperature from climate simulations and reconstructions of the last millennia" accepted in Physical Review E (2021) (preprint https://arxiv.org/abs/2102.00458).
 
 Authors: Beatrice Ellerhoff and Kira Rehfeld 
 
