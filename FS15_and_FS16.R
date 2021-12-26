@@ -12,11 +12,6 @@ ggplot(rmse, aes(x=beta)) + geom_point(aes(y=sqrt(mean), shape=method), size=2) 
    theme(panel.background = element_rect(fill = "transparent", colour = "black", size=.8), legend.position = c(0.8, 0.78)) +
   guides(shape=guide_legend(ncol=1)) +
   xlab(TeX("$\\beta$")) + ylab(TeX("root-mean-squared error")) +
-  #geom_point(aes(y=rep(rmse$sd_mean[!is.na(rmse$sd_mean)],each=2)), shape=4,
-   #             color = "grey50", size=1.5) + 
-#  geom_line(aes(x=rep(unique(rmse$beta), each=2),y=rep(rmse$sd_mean[!is.na(rmse$sd_mean)],each=2)), linetype="dashed", color = "grey50", size=0.8) +
-  #annotate(geom="text", x=min(beta_seq)+.25, y=mean(rmse$sd_mean, na.rm=T)+0.01, label=TeX("$\\Delta \\beta_{LR}$"),
-  #            color="grey30") + 
   theme(legend.background = element_rect(fill="white",
                                   size=0.5, linetype="solid", 
                                   colour ="grey50"),
