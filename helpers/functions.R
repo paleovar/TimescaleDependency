@@ -61,13 +61,13 @@ MeanSpec <- function(specList, iRemoveLowest = 1, weights = rep(1, length(specLi
 #' @param name.data name of the nested spectrum column, i.e. either "Spec" or "Smooth_spec"
 #' @return ggplot
 #' @export
-plot_spec <- function(tibble, ylims, xlims, name.y=TeX('PSD $S(\\tau)\\,(K^2 yr)$ '), name.x=TeX('period $\\tau (yr)$'), name.data = "data"){
+plot_spec <- function(tibble, ylims, xlims, name.y=TeX('PSD $S(\\tau)\\, (K^2 yr)$ '), name.x=TeX('period $\\tau\\,(yr)$'), name.data = "data", name.fill="signal", name.line=NULL){
     yrs.period <- rev(c(0.0001, 0.001, 0.01,  0.1, 1, 10, 100, 1000, 10000, 100000, 1000000))
     yrs.labels <- rev(c(TeX('$10^{-4}$'),TeX('$10^{-3}$'), TeX('$10^{-2}$'), TeX('$10^{-1}$'), TeX('$10^{0}$'), TeX('$10^{1}$'), TeX('$10^{2}$'), TeX('$10^{3}$'), TeX('$10^{4}$'), TeX('$10^{5}$'), TeX('$10^{6}$')))
     tibble %>% unnest(name.data) %>%
-        ggplot(aes(x = 1/freq, y = spec, color=signal)) +
-        geom_ribbon(alpha=0.2, aes(ymin=lim.1, ymax=lim.2, fill=signal), linetype = 0) + guides(fill=FALSE) +
-        geom_line(size=0.4) + theme_td() +
+        ggplot(aes(x = 1/freq, y = spec)) +
+        geom_ribbon(alpha=0.2, aes_string(ymin="lim.1", ymax="lim.2", fill=name.fill), linetype = 0) + guides(fill=FALSE) +
+        geom_line(size=0.4, aes_string(color=name.fill, linetype=name.line)) + theme_td() +
         scale_y_log10(name=name.y, label = scales::trans_format("log10", scales::math_format(10^.x)), expand=c(0.0, 0.0), limits=ylims, sec.axis = dup_axis(name = NULL, labels = NULL))  +
         scale_x_continuous(trans=reverselog_trans(10), breaks = yrs.period, labels = yrs.labels, name=name.x,expand=c(0.0, 0.0), limits=xlims, sec.axis = dup_axis(name = NULL, labels = NULL)) 
     }
@@ -201,7 +201,6 @@ tibble_to_list <- function(tibble_spec_obj){
   }
   )
 }
-
 
 list_to_tibble <- function(list_spec_obj){
   
