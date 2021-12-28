@@ -33,3 +33,8 @@ theme_td <- function(textsize=9){
           legend.text = element_text(size=textsize),
           legend.key.height = unit(0.2, "cm")) 
 }
+
+t2 <- readRDS("helpers/signal_tbb.Rds")
+t <- readRDS("helpers/meta_res.Rds")
+t <- inner_join(t, t2)
+saveRDS(t, "helpers/signal_tbb.Rds")
