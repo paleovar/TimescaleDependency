@@ -21,14 +21,13 @@ ggplot(dat, aes(x=time, y=val)) +
 #---------------------#
 #FS4
 tmp_spec <- readRDS("data/proxy_spectra.Rds") 
-tmp_spec <- tmp_spec %>% inner_join(., tbb,by="Name")
 
 yrs.period <- rev(c(0.0001, 0.001, 0.01,  0.1, 1, 10, 100, 1000, 10000, 100000, 1000000))
 yrs.labels <- rev(c(TeX('$10^{-4}$'),TeX('$10^{-3}$'), TeX('$10^{-2}$'), TeX('$10^{-1}$'), TeX('$10^{0}$'), TeX('$10^{1}$'), TeX('$10^{2}$'), TeX('$10^{3}$'), TeX('$10^{4}$'), TeX('$10^{5}$'), TeX('$10^{6}$')))
 
-ggplot(tmp_spec %>% unnest(data), aes(x=freq, y=spec)) + 
+ggplot(tmp_spec %>% unnest(Spec)) + 
     facet_wrap(~ID) +
-    geom_line(aes(x=1/freq, y = spec),color="black", size=0.1) +
+    geom_line(aes(x=1/freq, y=temp),color="black", size=0.1) +
     scale_y_log10(labels = trans_format("log10", math_format(10^.x)), name=TeX('PSD $S(\\tau)\\, (K^2 yr)$ '), expand=c(0.2, 0.2), 
                   sec.axis = dup_axis(name = NULL, labels = NULL))  + 
     scale_x_continuous(trans=reverselog_trans(10), breaks = yrs.period, labels = yrs.labels,   
