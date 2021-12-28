@@ -29,3 +29,4 @@ Creating some of the figures requires:
 - raster
 - ggcorrplot
 - nest
+- ggridges
