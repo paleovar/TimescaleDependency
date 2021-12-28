@@ -1,5 +1,7 @@
 source("helpers/stacymap.R")
 source("helpers/init.R")
+
+#F3
 pages <- readRDS("data/beta_N100.Rds") %>% filter(signal=="pages2k")
 tbb <- readRDS("data/scaling_tbb.Rds")
 signal_tbb <-readRDS("helpers/signal_tbb.Rds")
@@ -19,7 +21,6 @@ idx <- which(abs(diff(points_tbb$long)) <5)[which(abs(diff(points_tbb$long)) <5)
 points_tbb$long[idx] <- jitter(points_tbb$long[idx], factor=1.5)
 points_tbb$lat[idx] <- jitter(points_tbb$lat[idx], factor=1.5)
 
-#####
 
 for(n in model_names){
   subset <- tbb %>% group_by(scale) %>% filter(scale=="cen") %>% filter(model==n) %>% rename(long = lon) 
@@ -57,7 +58,6 @@ for(n in model_names){
     theme(plot.title = element_text(size = 9, face="bold", hjust=0.5))
 }
 
-#tbb <- readRDS(paste0(pages.dir, "scaling_tbb_", warm_cutoff, ".Rds"))
 zones <- tibble(name=c("pole.N", "temperate.N", "tropics.N", "tropics.S", "temperate.S", "pole.S"),
                 lat.1=c(90, 60, 30, 0, -30, -60),
                 lat.2=c(60, 30, 0, -30, -60, -90))
@@ -113,7 +113,7 @@ for(i in model_names){
       theme(axis.title.y=element_blank(), axis.text.y=element_blank(), plot.margin = unit(c(0.95, 0.5, -0.65, 0.5), "cm"))
   }
 }
-#####
+
 w1 <- 3
 w2 <- 1.75
 b <- 0.4
@@ -132,13 +132,11 @@ prow <- cowplot::plot_grid(
             #align="v",
             rel_widths=c(w1, null_width, w2),
             ncol=3),
-  #geom_text(data=pages_cen, aes(x = long, y = lat, label=ID),hjust=-0.3, vjust=0, nudge_x = 5, nudge_y=1, fontface = "bold", size=2.2),
   cowplot::plot_grid(plots_cen$CESM + theme(legend.position="none", axis.title.x=element_blank(),
                                    axis.text.x=element_blank(), axis.title.y=element_blank(),
                                    axis.text.y=element_blank(), plot.margin = unit(c(b, l, t, r), "cm")),
             NULL,
             plots_lat$CESM,
-           # align="v",
             rel_widths=c(w1, null_width, w2),
             ncol=3),
   cowplot::plot_grid(plots_cen$CESM_LM + theme(legend.position="none", axis.title.x=element_blank(),
@@ -146,14 +144,12 @@ prow <- cowplot::plot_grid(
                                       axis.text.y=element_blank(), plot.margin = unit(c(b, l, t, r), "cm")),
             NULL,
             plots_lat$CESM_LM,
-            #align="h",
             rel_widths=c(w1,null_width,  w2),
             ncol=3),
   cowplot::plot_grid(plots_cen$CESM_LM_cont + theme(legend.position="none", axis.title.x=element_blank(), 
                                            plot.margin = unit(c(b, l, t, r), "cm")),
             NULL,
             plots_lat$CESM_LM_cont,
-            #align="h",
             rel_widths=c(w1,null_width,  w2),
             ncol=3),
   cowplot::plot_grid(plots_cen$`MPI-M` + theme(legend.position="none",axis.title.x=element_blank(), axis.title.y=element_blank(),
@@ -161,7 +157,6 @@ prow <- cowplot::plot_grid(
                                       axis.text.y=element_blank()),
             NULL,
             plots_lat$`MPI-M`,
-           # align="h",
             rel_widths=c(w1,null_width,  w2),
             ncol=3),
   cowplot::plot_grid(plots_cen$`MPI-M_cont` + theme(legend.position="none", axis.title.x=element_blank(), axis.title.y=element_blank(),
@@ -169,14 +164,12 @@ prow <- cowplot::plot_grid(
                                            axis.text.y=element_blank()),
             NULL,
             plots_lat$`MPI-M_cont`,
-            #align="h",
             rel_widths=c(w1, null_width, w2),
             ncol=3),
   cowplot::plot_grid(plots_cen$ECHAM5 + theme(legend.position="none", 
                                      plot.margin = unit(c(b, l, t, r), "cm")),
             NULL,
             plots_lat$ECHAM5,
-            #align="h",
             rel_widths=c(w1, null_width, w2),
             ncol=3),
   cowplot::plot_grid(plots_cen$Trace21k_orb + theme(legend.position="none", axis.title.y=element_blank(),
@@ -184,7 +177,6 @@ prow <- cowplot::plot_grid(
                                            axis.text.y=element_blank()),
             NULL,
             plots_lat$Trace21k_orb,
-            #align="h",
             rel_widths=c(w1,null_width, w2),
             ncol=3),
   cowplot::plot_grid(plots_cen$Trace21k + theme(legend.position="none", axis.title.y=element_blank(),
@@ -192,7 +184,6 @@ prow <- cowplot::plot_grid(
                                        axis.text.y=element_blank()), 
             NULL,
             plots_lat$Trace21k,
-            #align="h",
             rel_widths=c(w1,null_width,  w2),
             ncol=3),
   cowplot::plot_grid(plots_cen$IPSL + theme(legend.position="none", axis.title.y=element_blank(),
@@ -200,7 +191,6 @@ prow <- cowplot::plot_grid(
                                    axis.text.y=element_blank()),
             NULL,
             plots_lat$IPSL,
-            #align="h",
             rel_widths=c(w1, null_width, w2),
             ncol=3),
   NULL,
@@ -211,7 +201,6 @@ prow <- cowplot::plot_grid(
   label_y=0.98,
   nrow = 7,
   rel_heights = c(2, 4, 4, 4, 4, 4.2, 0.5)#,
-#  scale=
 )
 
 legend1 <- cowplot::get_legend(
@@ -226,8 +215,8 @@ cowplot::ggdraw() +
   cowplot::draw_plot(prow, scale=1, vjust=-0.09) +
   cowplot::draw_plot(legend1, vjust=0.46)
 
-#---------------------------------------------#  
-
+#---------------------#
+#FS12
 prow <- cowplot::plot_grid(
   plots_slopesd$HadCM3 + theme(legend.position="none", axis.title.x=element_blank(),
                            axis.text.x=element_blank(), plot.margin = unit(c(0.1, 0.1, -0.2, 0.1), "cm")),   plots_slopesd$CESM + theme(legend.position="none", axis.title.x=element_blank(),

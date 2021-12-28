@@ -1,9 +1,9 @@
 library(irr)
 source("helpers/init.R")
 
+#F4
 tbb <- readRDS("data/beta_N100.Rds") 
 
-# Load and inspect a demo data
 kappa.stat <- function(target1, target2, method){
   tmp <- categories %>% select(Name, signal, category) %>% filter(signal %in% c(target1, target2)) %>% group_by(signal) %>% nest()
   if(any(tmp$data[[1]]$Name != tmp$data[[2]]$Name)){stop("Names not matching for cases studied")}
@@ -77,9 +77,9 @@ ggplot(data = tbb,aes(x = alt_name2, y = -slope, ymin=-slope+slopesd_new, ymax=-
         legend.key.height=unit(0.7, "cm"),
         legend.key.width=unit(0.2, "cm")) 
 
-
-#----------------------------------------------------#
-
+#---------------------#
+#FS11
+  
 ns <- unique(tbb$Name)
 res <- tibble()
 for(i in ns){

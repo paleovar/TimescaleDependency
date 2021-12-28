@@ -1,5 +1,6 @@
 source("helpers/init.R")
 
+#FS14
 res <- readRDS("data/supp/lr_mle_comp_N200_samples6000.Rds")
 beta_seq <- seq(-1, 3, by=0.5)
 rmse <- res %>% unnest(data) %>% mutate(dev = ((-1)*beta-slope)**2) %>% group_by(beta, method) %>% summarise(mean=mean(dev), sd_mean=mean(slopesd)) %>% filter(method %in% c("MLE_Rlaw", "LR"))
@@ -19,7 +20,9 @@ ggplot(rmse, aes(x=beta)) + geom_point(aes(y=sqrt(mean), shape=method), size=2) 
   labs(shape="estimator") +
   scale_shape(solid=T) +
   scale_shape_manual(values=c(17, 15), breaks=c("LR", "MLE_Rlaw"), labels=c("LR", "MLE"))
-    
+
+#---------------------#
+#FS15    
 res <- readRDS("data/supp/lr_mle_comp_beta_irr_N200.Rds")
 
 tbb1 <- res %>% unnest(data) %>% group_by(Name, beta) %>% 

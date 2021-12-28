@@ -1,5 +1,8 @@
 source("helpers/init.R")
 source("helpers/functions.R")
+
+#---------------------#
+#F5
 summary <- readRDS("data/forcing_tbb.Rds")
 forc_speclist_smoothed_tbb <-  readRDS("data/forcing_spectra_sm.Rds")
 cut_colors <- setNames(c("#AA3377", "#228833", "#4477AA", "grey20",  "#CCBB44"), c("sol", "ghg", "vol", "orb", "lu"))
@@ -75,10 +78,9 @@ cowplot::plot_grid(
     rel_widths=c(1.25, 1, 1)
   )
 
-#----------------------------------------------
-    
+#---------------------#
+#FS5
 cut_colors <- setNames(c("#AA3377", "#228833", "#4477AA", "grey20"), c("meansol", "meanco2", "meanvol", "Berger78"))
-
 forc_speclist_smoothed_tbb  <- bind_rows(forc_speclist_smoothed_tbb, forc_speclist_smoothed_tbb_orb)
 
 plotmeans <- forc_speclist_smoothed_tbb %>% filter(Name %in% c("meansol", "meanvol", "meanco2")) %>% 

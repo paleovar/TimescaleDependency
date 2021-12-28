@@ -2,7 +2,7 @@ source("helpers/init.R")
 source("helpers/functions.R")
 meta.res_tbb <-readRDS("helpers/meta_res.Rds")
 GMST <- readRDS("data/GMST_tbb.Rds")
-#---Global Mean Surface Air Temperature Spectra---#
+
 split <- function(tibble){
     tibble <-  rowid_to_column(tibble, "ID")
     tbb1 <- tibble %>% filter(signal %in% c(signal_tbb %>% filter(type=="obs"&signal!="pages2k") %>% select(signal))$signal|grepl("highres",signal))
