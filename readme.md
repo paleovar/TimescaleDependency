@@ -3,8 +3,11 @@ Coming soon.
 This repository provides code to reproduce the figures of "Probing the timescale dependency of local and global variations in surface air temperature from climate simulations and reconstructions of the last millennia" published in Physical Review E (2021).
 
 URL: https://journals.aps.org/pre/abstract/10.1103/PhysRevE.104.064136
+
 DOI: 10.1103/PhysRevE.104.064136
+
 AUTHORS: Beatrice Ellerhoff and Kira Rehfeld 
+
 CONTACT: beatrice.ellerhoff(at)iup.uni-heidelberg.de
 
 
