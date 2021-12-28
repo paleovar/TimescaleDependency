@@ -28,7 +28,8 @@ tmp_spec %>% ungroup() %>% select(-signal) %>% rename(signal=alt_name) %>% filte
     scale_linetype_manual(values=c("CESM-LME 1"="solid", "CESM-LME 1 (cntl)"="dashed", "MPI-M LM"="solid", "MPI-M LM (cntl)"="dashed")) +
     annotate(geom="text", x=c(8,8), y=c(0.006, 2), label=c("global", "local"), size=9/2.8, col="black") +
     guides(colour = guide_legend(override.aes = list(linetype = c("solid", "dashed", "solid", "dashed"))))
-
+rm(tmp_spec)
+gc()
 #---------------------#
 #FS7
 tmp_spec <- readRDS("data/CESM_spectra.Rds") %>% rename(signal=model)
@@ -40,3 +41,18 @@ scale_color_manual(values=c("CESM_LM"="#0F2080",  "CESM_LM_highres"="#85C0F9", "
                      labels=c("CESM-LME 1",  "CESM-LME 1 (hr)", "mean spectrum"),
                      breaks=c("CESM_LM",   "CESM_LM_highres", "CESM_mean")) +
 guides(colour = guide_legend(override.aes = list(linetype = c("solid", "solid", "dashed"))))
+rm(tmp_spec)
+gc()
+#---------------------#
+#FS9
+tmp_spec <- readRDS("data/pages_spectra_selection.Rds") %>% rename(signal=model)
+
+tmp_spec %>% plot_spec(ylims=c(0.05, 30), xlims=c(1.e3, 2), name.col="cutoff", name.fill="res", name.line="res", name.alpha="cutoff") +
+    scale_fill_manual(values=c("#F5793A", "#0F2080")) +
+    scale_linetype_manual(values=c("dashed", "solid"), name="coverage:", labels=c("PI", "hist")) +
+    scale_color_manual(values=c( "#F5793A",  "#0F2080"), name="selection:") +   
+    scale_alpha_manual(values=rep(0.1, 4)) +
+    guides(alpha=F, linetype = guide_legend(order = 2), color = guide_legend(order = 1)) +
+    theme(legend.key.size = unit(0.5, "cm"),
+          legend.title = element_text("selection"),
+          legend.position = c(0.3, 0.15))

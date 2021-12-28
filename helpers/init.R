@@ -6,6 +6,7 @@ library(latex2exp)
 library(scales)
 library(tseries)
 library(PaleoSpec)
+library(tibble)
 select <- dplyr::select
 
 signal_tbb <- readRDS("helpers/signal_tbb.Rds")
