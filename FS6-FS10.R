@@ -1,5 +1,4 @@
 #FS6
-
 source("helpers/init.R")
 source("helpers/functions.R")
 rmst_spec <- readRDS("data/local_mean_spectra.Rds")
@@ -44,6 +43,90 @@ guides(colour = guide_legend(override.aes = list(linetype = c("solid", "solid", 
 rm(tmp_spec)
 gc()
 #---------------------#
+#FS8
+library(purrr)
+stot <- function(specmtm){
+  if("dof" %in% names(specmtm)){
+    specmtm <- AddConfInterval(specmtm)
+  return(tibble(spec=specmtm$spec, 
+         freq=specmtm$freq,
+         dof=specmtm$dof,
+         lim.1=specmtm$lim.1, 
+         lim.2=specmtm$lim.2))
+    }
+  if(!"dof" %in% names(specmtm)){
+    return(tibble(spec=specmtm$spec, 
+                  freq=specmtm$freq))
+    }
+}
+prxlist <- readRDS("data/proxylist.Rds")
+prxspec <- readRDS("data/proxy_spectra.Rds") 
+prxscaling <- readRDS("data/beta_N100.Rds") %>% filter(signal=="pages2k")
+diffs.norm <- prxlist %>% mutate(diffs=purrr::map(data, function(x) diff(index(x)))) %>% select(-data) %>% rename(data=diffs)
+test <- inner_join(prxspec, inner_join(diffs.norm, prxscaling, by="Name"), by="Name")
+tbb <- list()
+scale="cen"
+tscales <- list()
+tscales <- c(10,200)
+
+tbb <- test %>% mutate(tmp = purrr:::map2(data, slope, function(.data, .slope) sample_from_proxy(.data, (-1)*.slope))) %>%
+  mutate(powerlaw = purrr::map(tmp, function(.tmp) .tmp[["powerlaw"]]), 
+         sample = purrr::map(tmp, function(.tmp) .tmp[["sample"]]))   
+
+tbb <- tbb %>% mutate(ts = map2(sample, interp.res, function(.sample, .interp.res) 
+  MakeEquidistant(index(.sample), coredata(.sample), dt=.interp.res))) 
+
+tbb <- tbb %>%  mutate(comparison = map2(powerlaw, interp.res, function(.powerlaw, .interp.res)
+    MakeEquidistant(index(as.ts(.powerlaw)), coredata(as.ts(.powerlaw)), dt = .interp.res))) 
+
+#compute spectrum for block-averaged, equidistant artificial proxy series (ts) and for the comparison   
+tbb <- tbb %>% mutate(spec = purrr::map(ts, function(.ts) SpecMTM(na.approx(.ts), k=3, nw=2, detrend=TRUE))) 
+
+tbb <- tbb %>% mutate(comparison.spec =  map2(comparison, ts, function(.comparison, .none){ SpecMTM(.comparison, k=3, nw=2, detrend=TRUE)}))
+
+tbb <- tbb %>% mutate(temp = map2(spec, comparison.spec, function(.spec, .none) 
+  SlopeFit(.spec, 1/200, 1/10))) %>%    
+  mutate(simslope = map2(temp, comparison.spec, function(.temp, .none) .temp$slope)) %>%     
+  mutate(slopesd = map2(temp, comparison.spec, function(.temp, .none) .temp$slopesd)) %>% 
+  mutate(compslope = map2(comparison.spec, temp, function(.comparison.spec, .none)
+    SlopeFit(.comparison.spec, 1/200, 1/10)$slope)) %>% 
+  select(-temp, -tmp)
+
+ex <- which(tbb$Name == "NAm-LakeMina")
+colors <- c("surrogate" = "#0F2080", "block averaged surrogate" = "#85C0F9", "raw signal" = "#F5793A")
+linetype <- c("surrogate" = "dotted", "block averaged surrogate" = "solid", "raw signal" = "dashed")
+pointshape <- c("surrogate" = 17,"block averaged surrogate" = 16, "raw signal" = 15)
+surrogate <- ltot(tbb$spec) %>% filter(Name == ex) %>% select(data) 
+raw <- SpecMTM(na.remove(MakeEquidistant(index(c(prxlist %>% filter(Name==tbb$Name[[ex]]))$data[[1]]), coredata(c(prxlist %>% filter(Name==tbb$Name[[ex]]))$data[[1]]), dt=tbb$interp.res[[ex]])))
+bavg_surrogate <- tbb$comparison.spec[[ex]]
+
+bavg_surrogate_fit <- SlopeFit(bavg_surrogate, 1/max(tscales[[scale]]), 1/min(tscales[[scale]]), bDebug=FALSE)
+colors <- c(colors, "smoothed spectrum"="#0F2080", "fit"="black")
+linetype <- c(linetype, "smoothed spectrum"="dotted", "fit"="longdash", "raw signal" = "dashed")
+slope <-bavg_surrogate_fit$slope
+slopesd <-bavg_surrogate_fit$slopesd
+int <- bavg_surrogate_fit$intercept
+temp <- paste(paste('beta[fit] == ', round(-1*slope,2)), " %+-% ", round(slopesd,2))
+
+ggplot() + theme_td() +
+  geom_ribbon(data=stot(raw), alpha=0.1, aes(x = 1/freq, ymin=lim.1, ymax=lim.2,  fill="raw signal")) +
+  geom_ribbon(data=stot(bavg_surrogate), alpha=0.2, aes(x = 1/freq, ymin=lim.1, ymax=lim.2,  fill="block averaged surrogate")) +
+  scale_fill_manual(values=colors) +
+  scale_y_log10(TeX('PSD $S(\\tau)\\, (K^2 yr)$ '), label = trans_format("log10", math_format(10^.x)),expand=c(0., 0.1), sec.axis = dup_axis(name = NULL, labels = NULL))  + 
+  scale_x_continuous(trans=reverselog_trans(10), breaks = yrs.period, labels = yrs.labels,  expand=c(0., 0.), sec.axis = dup_axis(name = NULL, labels = NULL), name=TeX('period $\\tau\\,(yr)$')) + 
+  geom_line(data=stot(raw), aes(x=1/freq,y=spec, color="raw signal", linetype="raw signal"), size=pointsize) +
+  geom_line(data=stot(bavg_surrogate), aes(x=1/freq, y=spec, color='block averaged surrogate', linetype="block averaged surrogate"), alpha=0.8, size=pointsize) +
+  geom_line(data=stot(bavg_surrogate_fit), aes(x=1/freq, y=spec, color='smoothed spectrum', linetype="smoothed spectrum"), alpha=0.8, size=pointsize) +
+  geom_line(data= stot(bavg_surrogate), aes(x=1/freq, y=((1/freq)**(-slope))*(exp(int)), linetype="fit"), color="black") +
+  geom_vline(xintercept = c(200, 10), color="grey50", alpha=0.5) + 
+  theme(legend.position=c(0.41, 0.34)) +
+  scale_color_manual(values = colors, breaks=c("raw signal", "block averaged surrogate", "smoothed spectrum"), labels=c("raw spectrum", "surrogate spectrum", "smooothed surrogate spectrum"))  +
+  scale_linetype_manual(values=linetype) +
+  annotate(geom="text", x=50, y=0.003, label=expression(paste("Proxy: NAm-LakeMina, ", beta, "=1.31,", Delta, "t=3.98")), size=notationsize) +
+  annotate(geom="text", x=28, y=100, label= temp,  size=notationsize, parse=TRUE) +
+  guides(colour = guide_legend(override.aes = list(linetype = c("dashed", "solid", "dotted")))) +
+  guides(fill=FALSE, linetype=FALSE)
+#---------------------#
 #FS9
 tmp_spec <- readRDS("data/supp/pages_spectra_selection.Rds") %>% rename(signal=model)
 
@@ -56,7 +139,8 @@ tmp_spec %>% plot_spec(ylims=c(0.05, 30), xlims=c(1.e3, 2), name.col="cutoff", n
     theme(legend.key.size = unit(0.5, "cm"),
           legend.title = element_text("selection"),
           legend.position = c(0.3, 0.15))
-
+rm(tmp_spec)
+gc()
 #---------------------#
 #FS10
 library(ggridges)

@@ -1,6 +1,6 @@
 source("helpers/stacymap.R")
 source("helpers/init.R")
-pages <- readRDS("data/proxy_scaling.Rds")
+pages <- readRDS("data/beta_N100.Rds") %>% filter(signal=="pages2k")
 tbb <- readRDS("data/scaling_tbb.Rds")
 signal_tbb <-readRDS("helpers/signal_tbb.Rds")
 model_names <- (signal_tbb %>% filter(type=="model") %>% filter(!signal %in% c("MPI-M_highres", "CESM_LM_highres")) %>% dplyr::select(signal))$signal

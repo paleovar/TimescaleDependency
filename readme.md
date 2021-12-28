@@ -18,6 +18,7 @@ required packages:
 - latex2exp
 - tseries
 - PaleoSpec
+- purrr
 
 Creating some of the figures requires:
 - cowplot

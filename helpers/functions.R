@@ -279,3 +279,30 @@ cut <- function(target, from, to, index=FALSE)
     return(target)
   }
 }
+
+#' @title
+#' @description 
+#' @param
+#' @param
+#' @param 
+#' @return 
+#' @export
+sample_from_proxy <- function(diffs, beta){
+  #get temporal resolution of proxy records
+
+  #simulate time series with powerlaw scaling, resolution of 1 year and same length as proxy 
+  powerlaw <- PaleoSpec::SimPowerlaw(beta, ceiling(sum(diffs)))
+
+  sums <- cumsum(diffs)
+  
+  avg <- PaleoSpec::AvgToBin(index(powerlaw), powerlaw, breaks= c(sums))
+  df <- zoo(avg$avg, order.by = avg$breaks)
+  df <- df[1:(length(df)-1)]
+  powerlaw <- powerlaw[1:length(powerlaw)-1]
+  
+  plot(powerlaw, col="red", type="p")
+  lines(df, col="blue", type="p")
+  
+  if(any(unique(index(df)) != index(df))){print("non-unique")}
+  return(list(sample=df, powerlaw=powerlaw))
+}
