@@ -4,7 +4,6 @@
 *.png
 *.pdf
 *.svg
-data/
 .Rproj.user
 cache/*
 figures/*
