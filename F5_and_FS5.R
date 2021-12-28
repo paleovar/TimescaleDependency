@@ -3,17 +3,10 @@ source("helpers/functions.R")
 
 #---------------------#
 #F5
-summary <- readRDS("data/forcing_tbb.Rds")
-forc_speclist_smoothed_tbb <-  readRDS("data/forcing_spectra_sm.Rds")
-cut_colors <- setNames(c("#AA3377", "#228833", "#4477AA", "grey20",  "#CCBB44"), c("sol", "ghg", "vol", "orb", "lu"))
+summary <- readRDS("data/forcing_tbb.Rds") 
+cut_colors <- setNames(c("#AA3377", "#228833", "#4477AA", "grey20"), c("sol", "ghg", "vol", "orb"))
 
-test <- forc_speclist_smoothed_tbb %>% full_join(., summary %>% select(Name, forcing, label))
-test$forcing[which(is.na(test$forcing))] <- test$Name[which(is.na(test$forcing))] 
-
-forc_speclist_smoothed_tbb <- test
-
-forc_speclist_smoothed_tbb_orb <- forc_speclist_smoothed_tbb %>% filter(forcing=="Berger78")
-forc_speclist_smoothed_tbb <- forc_speclist_smoothed_tbb %>% filter(forcing!="orb") %>% filter(!forcing=="Berger78")
+forc_speclist_smoothed_tbb <- readRDS("data/forcing_spectra.Rds")
 
 N <- setNames(c(forc_speclist_smoothed_tbb %>% count(forcing) %>% select(n))$n, c(forc_speclist_smoothed_tbb %>% count(forcing) %>% select(forcing))$forcing)
 
@@ -84,15 +77,17 @@ cowplot::plot_grid(
 #---------------------#
 #FS5
 cut_colors <- setNames(c("#AA3377", "#228833", "#4477AA", "grey20"), c("meansol", "meanco2", "meanvol", "Berger78"))
-forc_speclist_smoothed_tbb  <- bind_rows(forc_speclist_smoothed_tbb, forc_speclist_smoothed_tbb_orb)
+orb_shortterm <- readRDS("data/forcing_orb_shortterm_spectra.Rds")
+orb_longterm <- readRDS("data/forcing_orb_longterm_spectra.Rds")
 
-plotmeans <- forc_speclist_smoothed_tbb %>% filter(Name %in% c("meansol", "meanvol", "meanco2")) %>% 
+forc_speclist_smoothed_tbb %>% filter(Name %in% c("meansol", "meanvol", "meanco2")) %>% 
   unnest(data) %>%
   ggplot() +
   theme_td() + 
   geom_ribbon(aes(x=1/freq, ymin=lim.1, ymax=lim.2, fill=forcing), alpha=0.3) +
   geom_line(aes(x=1/freq, y = spec, color=forcing), size=pointsize) +
-  geom_line(data= forc_speclist_smoothed_tbb_orb %>% unnest(data), aes(x=1/freq, y = spec, color=forcing), size=pointsize) +
+  geom_line(data=orb_shortterm %>% unnest(data), aes(x=1/freq, y = spec, color=forcing), size=pointsize) +
+  geom_line(data=orb_longterm %>% unnest(data), aes(x=1/freq, y = spec, color=forcing), size=pointsize) +
   scale_color_manual(values=cut_colors, labels=c("orbital", "CO2", "solar", "volcanic")) +
   guides(fill=FALSE) +
   scale_fill_manual(values=cut_colors) + 
@@ -102,5 +97,3 @@ plotmeans <- forc_speclist_smoothed_tbb %>% filter(Name %in% c("meansol", "meanv
   guides(color=guide_legend(ncol=2)) +
   annotate("text", x=c(rep(1000,4)), y=c(5e-7, 5e-8, 5e-6, 5e-9), hjust = 0, label=c("solar", TeX("CO$_2$"), "volcanic", "orbital"), size=9/2.5, color=cut_colors) +
   guides(color = guide_legend(override.aes = list(linetype = 0)))
-
-print(plotmeans)
