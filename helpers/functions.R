@@ -132,29 +132,7 @@ colorRampAlpha <- function(..., n, alpha) {
   paste(colors, sprintf("%x", ceiling(255*alpha)), sep="")
 }
 
-#--------------------------------------------------------------#
-#' @title
-#' @description 
-#' @param
-#' @param
-#' @param 
-#' @return 
-#' @export
-ltot <- function(list_spec_obj){
-  
-  df <- tibble(Name=character(), data=list())
-  for (i in 1:length(list_spec_obj)){ 
-    tmp <-  coredata(list_spec_obj)
-    if(is.null(names(list_spec_obj))){
-      list_spec_obj <- as.list(list_spec_obj)
-      names(list_spec_obj) <- as.character(seq(1, length(list_spec_obj),1))}
-    df <- df %>% add_row(
-      Name = names(list_spec_obj)[[i]], 
-      data = list(tmp[[i]])
-    )
-  }
-  return(df)
-}
+
 
 #--------------------------------------------------------------#
 #' @title

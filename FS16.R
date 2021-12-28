@@ -2,9 +2,8 @@ source("helpers/init.R")
 source("helpers/functions.R")
 library(nest)
 
-pages.prxlist <- readRDS("data/proxylist.Rds")
 tbb <- readRDS("data/beta_N100.Rds")
-pages.prxlist <- ltot(pages.prxlist) %>% inner_join(., tbb %>% filter(signal=="pages2k"), by="Name") 
+pages.prxlist <- readRDS("data/proxylist.Rds") %>% inner_join(., tbb %>% filter(signal=="pages2k"), by="Name") 
 
 N <- length(pages.prxlist$data)
 
