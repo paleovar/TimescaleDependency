@@ -62,6 +62,8 @@ MeanSpec <- function(specList, iRemoveLowest = 1, weights = rep(1, length(specLi
 #' @return ggplot
 #' @export
 plot_spec <- function(tibble, ylims, xlims, name.y=TeX('PSD $S(\\tau)\\, (K^2 yr)$ '), name.x=TeX('period $\\tau\\,(yr)$'), name.data = "data", name.fill="signal", name.line=NULL){
+    xlims <- rev(sort(xlims))
+    ylims <- sort(ylims)
     yrs.period <- rev(c(0.0001, 0.001, 0.01,  0.1, 1, 10, 100, 1000, 10000, 100000, 1000000))
     yrs.labels <- rev(c(TeX('$10^{-4}$'),TeX('$10^{-3}$'), TeX('$10^{-2}$'), TeX('$10^{-1}$'), TeX('$10^{0}$'), TeX('$10^{1}$'), TeX('$10^{2}$'), TeX('$10^{3}$'), TeX('$10^{4}$'), TeX('$10^{5}$'), TeX('$10^{6}$')))
     tibble %>% unnest(name.data) %>%
@@ -73,7 +75,13 @@ plot_spec <- function(tibble, ylims, xlims, name.y=TeX('PSD $S(\\tau)\\, (K^2 yr
     }
 
 #--------------------------------------------------------------#
-
+#' @title
+#' @description 
+#' @param
+#' @param
+#' @param 
+#' @return 
+#' @export
 GetVar <- function (spec, f, dfreq = NULL, df.log = 0, bw = 3) 
 {
   if (f[1] >= f[2]) 
@@ -103,14 +111,26 @@ GetVar <- function (spec, f, dfreq = NULL, df.log = 0, bw = 3)
 }
 
 #--------------------------------------------------------------#
-
+#' @title
+#' @description 
+#' @param
+#' @param
+#' @param 
+#' @return 
+#' @export
 colorRampAlpha <- function(..., n, alpha) {
   colors <- colorRampPalette(...)(n)
   paste(colors, sprintf("%x", ceiling(255*alpha)), sep="")
 }
 
 #--------------------------------------------------------------#
-
+#' @title
+#' @description 
+#' @param
+#' @param
+#' @param 
+#' @return 
+#' @export
 ltot <- function(list_spec_obj){
   
   df <- tibble(Name=character(), data=list())
@@ -128,7 +148,13 @@ ltot <- function(list_spec_obj){
 }
 
 #--------------------------------------------------------------#
-
+#' @title
+#' @description 
+#' @param
+#' @param
+#' @param 
+#' @return 
+#' @export
 equidistant <- function(y){
   cnt <- 0
   y_equi <- y %>% add_column(EquiTS =
@@ -148,6 +174,13 @@ equidistant <- function(y){
 }
 
 #--------------------------------------------------------------#
+#' @title
+#' @description 
+#' @param
+#' @param
+#' @param 
+#' @return 
+#' @export
 tibble_spec <- function(y, k, nw){
   cnt <- 0
   y_spec <- y %>% add_column(Spec =
@@ -180,6 +213,13 @@ tibble_spec <- function(y, k, nw){
   return(y_spec)
 }
 
+#' @title
+#' @description 
+#' @param
+#' @param
+#' @param 
+#' @return 
+#' @export
 tibble_to_list <- function(tibble_spec_obj){
   tmp <- as.list(tibble_spec_obj)
   #names(tmp$Spec) <- tmp$model
@@ -202,6 +242,13 @@ tibble_to_list <- function(tibble_spec_obj){
   )
 }
 
+#' @title
+#' @description 
+#' @param
+#' @param
+#' @param 
+#' @return 
+#' @export
 list_to_tibble <- function(list_spec_obj){
   
   df <- tibble(model=character(), data=list()) 
@@ -222,4 +269,26 @@ list_to_tibble <- function(list_spec_obj){
     )
   }
   return(df)
+}
+
+#' @title
+#' @description 
+#' @param
+#' @param
+#' @param 
+#' @return 
+#' @export
+cut <- function(target, from, to, index=FALSE)
+{
+  if (index==FALSE){
+    target <- lapply(target, function(x) x[max(which.min(abs(1/target$freq - from)), 0):min(which.min(abs(1/target$freq - to)), length(target$freq))])
+    class(target) <- "spec"
+    return(target)
+  }
+  if (index==TRUE)
+  {
+    target <- lapply(target, function(x) x[from:to])
+    class(target) <- "spec"
+    return(target)
+  }
 }

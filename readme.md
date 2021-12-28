@@ -16,6 +16,7 @@ required packages:
 - ggplot2
 - latex2exp
 - tseries
+- PaleoSpec
 
 Creating some of the figures requires:
 - cowplot
