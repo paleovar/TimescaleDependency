@@ -32,3 +32,5 @@ Creating some of the figures requires:
 - ggcorrplot
 - nest
 - ggridges
+- grid
+- gridExtra

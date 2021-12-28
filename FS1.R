@@ -1,9 +1,9 @@
-library(tibble)
-library(zoo)
+source("helpers/init.R")
+source("helpers/functions.R")
+
+#FS1
 library(cowplot)
 library(forcats)
-source("helpers/init.R")
-
 dir <- "data/"
 GMST <- readRDS(paste0(dir, "/GMST_tbb.Rds")) %>% 
   filter(!signal %in% c("MPI-M_highres", "CESM_LM_highres", "ERA5_highres"))
@@ -89,5 +89,3 @@ cowplot::plot_grid(
   nrow = 1,
   rel_widths = c(2.5,1)
 )
-
-
