@@ -1,4 +1,4 @@
-#This code was mainly developed by Moritz Adam (https://github.com/MoritzAdam) for the Climatology and Biosphere (GUZ Tübingen) group, led by Kira Rehfeld. 
+#This code was developed by Moritz Adam (https://github.com/MoritzAdam) for the Climatology and Biosphere (GUZ Tübingen) group, led by Kira Rehfeld. 
 
 library(tidyverse)
 library(ggnewscale)
@@ -36,17 +36,15 @@ GLOBAL_STACY_OPTIONS <- list(
   GLOBAL_POINT_SIZE_DISCR = 3.5,
   GLOBAL_POINT_STROKE = 0.6,
   GLOBAL_LEG_TITLE_VJUST = 1,
-  #GLOBAL_BATHYMETRY_COLORS = c('#d9ebf9', '#cae1f4', '#afd3ef', '#aacde9', '#96c1e3', '#83b9df', '#6fadd6', '#5ba2d0', '#589cc9', '#337fb2', '#2a77ac', '#2371a6'),
   GLOBAL_LAND_COLOR = '#f0e6c2',
   GLOBAL_OCEAN_COLOR = '#aacde9',
-  GLOBAL_SHAPE_VALUES = c(3, 4, 6, 7, 9, 8, 10, 15, 16, 17, 18)# c('\u25BE', '\u25C6', '\u25A0', '\u25CF', '\u25B2', 'circle cross', 'cross', 'asterisk', 'plus', 'circle plus') # c('\u25BE', '\u25C6', '\u25A0', '\u25CF', '\u25B2', '\u1F7AC', '\u1F7CA', '\u1F7CE', '\u1F7C2', '\u1F7A5')#c(23, 22, 24, 21, 0:20)
+  GLOBAL_SHAPE_VALUES = c(3, 4, 6, 7, 9, 8, 10, 15, 16, 17, 18)
 )
 # helpers
 title_and_axis <- function(){
   ax <- theme_bw() + 
     theme(title = element_text(face = GLOBAL_STACY_OPTIONS$GLOBAL_FONT_FACE_TITLE, size = GLOBAL_STACY_OPTIONS$GLOBAL_FONT_SIZE + 1, family = GLOBAL_STACY_OPTIONS$GLOBAL_FONT_FAMILY),
           text = element_text(face = GLOBAL_STACY_OPTIONS$GLOBAL_FONT_FACE_TEXT, size = GLOBAL_STACY_OPTIONS$GLOBAL_FONT_SIZE, family = GLOBAL_STACY_OPTIONS$GLOBAL_FONT_FAMILY), 
-          #line = element_blank(),
           legend.direction = 'vertical', legend.box = 'vertical', legend.box.background = element_blank(), legend.background = element_rect(colour = 'black'), 
           strip.background.x = element_blank(), strip.text.x = element_text(face = GLOBAL_STACY_OPTIONS$GLOBAL_FONT_FACE_TITLE, hjust = 0), 
           strip.background.y = element_rect(fill = 'white'), strip.text.y = element_text(face = GLOBAL_STACY_OPTIONS$GLOBAL_FONT_FACE_TITLE, vjust = 0))
@@ -74,10 +72,6 @@ transform_shapefile <- function(data, transform) {
   }
 }
 
-
-
-
-
 #' Plot appealing maps of latlon-gridded and point-wise data
 #'
 #' @param gridlyr latlon-grid to plot of class raster, matrix (both lon columns, lat rows, cell value) or data.frame/tibble (either lon columns, lat rows, cell value or lon, lat, cell columns)
@@ -86,7 +80,6 @@ transform_shapefile <- function(data, transform) {
 #' @param ptlyr_shape_var character. optional pointlayer variable to map to point shape (given as additional column in ptlyr). (e.g. different databases)
 #' @param fldlyr field layer of class data.frame (lon,lat, angle(, radius)) containing the angle of the field (mandatory) and the radius (optional)
 #' @param coastline logical - plot coastline?
-##' @param bathymetry logical - plot ocean bathymetry?, option can be used independently of coastlines and will underlay a climate field
 #' @param projection object of class CRS or character (is converted to CRS), see package rgdal
 #' @param graticules logical, should a projected panel.grid be plotted?
 #' @param zoom numeric, c(west long, south lat, east long, north lat) to be cut off
@@ -106,26 +99,7 @@ transform_shapefile <- function(data, transform) {
 #'
 #' @return
 #' @export
-#'
-#' @examples 
-#' # plotting a field and points
-#' nc <- nc_open(PLASIM_TESTSLICE_PI)
-#' testfld <- ncvar_get(nc, varid = "ts")
-#' lat <- ncvar_get(nc, varid = "lat")
-#' lon <- ncvar_get(nc, varid = "lon")
-#' nc_close(nc)
-#' testfld <- testfld[,,1]
-#' ptlyr <- tibble(long = c(65, 30), lat = c(45, -60), value = c(300, 260))
-#' STACYmap(gridlyr = testfld, ptlyr = ptlyr, colorscheme = 'temp',
-#'          graticules = T, zoom = c(-100, -45, 100, 45), 
-#'          legend_names = list(grid = 'temp', pt = 'temp'))
-#' 
-#' # plotting points on a world map
-#' STACYmap(ptlyr = ptlyr, colorscheme = 'temp', filledbg = T, bathymetry = T)
-#' 
-#' # using other projections than the default robinson (here: Lambert azimuthal equal-area)
-#' # disclaimer: some combinations of projection and raster plots are not working yet
-#' plt <- STACYmap(ptlyr = ptlyr, colorscheme = 'temp', filledbg = T, projection = '+proj=laea +lat_0=52 +lon_0=10 +x_0=4321000 +y_0=3210000')
+
 STACYmap <- function(gridlyr = NULL, 
                      ptlyr = NULL, 
                      ptlyr_size_var = NULL,
@@ -133,8 +107,7 @@ STACYmap <- function(gridlyr = NULL,
                      fldlyr = NULL,
                      coastline = TRUE,
                      filledbg = FALSE,
-                    # bathymetry = FALSE,
-                     projection = as.character('+proj=robin +datum=WGS84'), #+proj=longlat +datum=WGS84
+                     projection = as.character('+proj=robin +datum=WGS84'),
                      graticules = TRUE, 
                      zoom = NULL, 
                      legend_names = list(grid = 'grid', pt = 'points'), 
@@ -152,9 +125,7 @@ STACYmap <- function(gridlyr = NULL,
 
   # projections
   ptlyro <- ptlyr; gridlyro <- gridlyr
-  #if (class(projection) == 'character') {
-  #  projection <- CRS(projection)
-  #}
+
   splcol <- FALSE; if (all(class(colorscheme) == 'list')) {splcol <- TRUE}
   if ((class(colorscheme) == 'list' & all(lapply(colorscheme[1:length(colorscheme)], length) == 1)) | (class(colorscheme) == 'character' & length(colorscheme) == 1)) {
     colorschemeo <- colorscheme
@@ -178,14 +149,7 @@ STACYmap <- function(gridlyr = NULL,
     if (class(colorschemeo) == 'character' & length(colorschemeo) == 1) {
       colorscheme <- unlist(colorscheme)
     }
-  } #else if (any(lapply(colorscheme[1:length(colorscheme)], length) != 1)) {
-  #print(lapply(colorscheme[1:length(colorscheme)], length))
-  #stop('mixing pre-defined and built-in colorschemes is not supported, please choose one option for all layers')
-  #}
-  
-  
-  ## checks and data preparation/projection
-  #if (length(colorscheme) == 1) {colorscheme <- unlist(colorscheme)}
+  } 
   
   xlim <- NULL; ylim <- NULL
   if (!is.null(zoom)) {
@@ -272,8 +236,6 @@ STACYmap <- function(gridlyr = NULL,
     }
   }
   
-  
-  #lims <- NULL
   if (!is.null(centercolor)) {
     if ((class(centercolor) != 'list' | length(centercolor) == 1) & splcol) {
       centercolor <- list(
@@ -341,60 +303,17 @@ STACYmap <- function(gridlyr = NULL,
   
   ## plotting
   map_plot <- ggplot()
-  
-  # bathymetry
-#  load_bathy <- FALSE
-#  if (bathymetry | filledbg) {
-#    if (exists('bathy_data', envir = .STACYmap)) {
-#      if (!is.null(.STACYmap$bathy_data[[as.character(projection)]])) {
-#        bathy_data <- .STACYmap$bathy_data[[as.character(projection)]]#lapply(as.vector(names(.STACYmap$bathy_data[[projection]])), function(d, x){as_tibble(x[[d]]) %>% mutate(depth = d)},
-#        #       x = .STACYmap$bathy_data[[projection]]) %>% setNames(., sort(c(200, seq(0, 10000, 1000))))
-#      } else {
-#        load_bathy <- TRUE
-#      }
-#    } else {
-#      load_bathy <- TRUE
-#    }
-#  }
-  
-  #if (load_bathy) {
-  #  bathy_data <- lapply(sort(c(200, seq(0, 10000, 1000))), function (x, L) {
-  #    load_natural_earth_data(file = paste0('ne_10m_bathymetry_', L[[as.character(x)]], '_', x, '.shp')) %>% 
-  #      spTransform(., CRSobj = CRS(projection)) %>% 
-  #      fortify(.)}, L = LETTERS[seq(1, 12, 1) %>% rev()] %>% 
-  #      setNames(., c(200, seq(0, 10000, 1000)) %>% sort())) %>% 
-  #    setNames(., sort(c(200, seq(0, 10000, 1000))))
-  #  .STACYmap$bathy_data[[as.character(projection)]] <- bathy_data
-  #}
-  
+
   if (filledbg) {
     map_data <- load_natural_earth_data(file = 'ne_50m_land.shp') %>% 
       spTransform(., CRSobj = CRS(projection)) %>% 
       fortify(.)
-    
-   # if (bathymetry) {
-   #   deps <- c(0, 200, seq(1e3, 1e4, 1e3)) %>% as.character()
-   #   cols <- GLOBAL_STACY_OPTIONS$GLOBAL_BATHYMETRY_COLORS
-   #   for (i in 1:12) {
-   #     map_plot <- map_plot + 
-   #       geom_polygon(data = bathy_data[[deps[i]]],
-   #                    mapping = aes(x = long, y = lat, group = group),
-   #                    fill = cols[i], 
-   #                    na.rm = T)
-   #   }
-   #   map_plot <- map_plot + 
-   #     geom_polygon(data = map_data, mapping = aes(x = long, y = lat, group = group, fill = hole)) + 
-   #     scale_fill_manual(values = c(GLOBAL_STACY_OPTIONS$GLOBAL_LAND_COLOR, NA), guide = FALSE) #+ 
-      #new_scale_fill() + new_scale_color()
-   # } else {
-      # TODO fix Caspian sea hole
+
       map_plot <- map_plot + 
         geom_polygon(data = bathy_data[['0']], mapping = aes(x = long, y = lat, group = group,  fill = TRUE, color = TRUE)) + 
         geom_polygon(data = map_data, mapping = aes(x = long, y = lat, group = group, fill = hole, color = hole)) + 
         scale_fill_manual(values = c(GLOBAL_STACY_OPTIONS$GLOBAL_LAND_COLOR, GLOBAL_STACY_OPTIONS$GLOBAL_OCEAN_COLOR), guide = FALSE) + 
         scale_color_manual(values = c(GLOBAL_STACY_OPTIONS$GLOBAL_LAND_COLOR, GLOBAL_STACY_OPTIONS$GLOBAL_OCEAN_COLOR), guide = FALSE) #+ 
-      #new_scale_fill() + new_scale_color()
-    #}
     
     if (!is.null(gridlyr) | !is.null(ptlyr)) {
       map_plot <- map_plot + 
@@ -425,7 +344,6 @@ STACYmap <- function(gridlyr = NULL,
   }
   
   # gridlyr
-  # TODO: option fopr multiple gridlyrs
   if (!is.null(gridlyr)) {
     map_plot <- map_plot + 
       geom_sf(data = gridlyr,
@@ -563,9 +481,9 @@ STACYmap <- function(gridlyr = NULL,
           axis.title = element_blank(), 
           legend.position = 'bottom',
           legend.box = 'horizontal',
-          panel.grid = element_line(colour = "darkgrey", size = 0.05),#element_blank(),, 
+          panel.grid = element_line(colour = "darkgrey", size = 0.05),
           plot.background = element_blank(), 
-          axis.ticks = element_blank()) # element_line(linetype = 'af', colour = 'grey50'))
+          axis.ticks = element_blank())
   
   if (!graticules) {
     map_plot <- map_plot + 
@@ -573,21 +491,21 @@ STACYmap <- function(gridlyr = NULL,
                crs = CRS(projection),
                datum = NA,
                xlim = {if (!is.null(xlim)) {xlim}},
-               ylim = {if (!is.null(ylim)) {ylim}},#c(-0.63*1e7, 0.77*1e7),
+               ylim = {if (!is.null(ylim)) {ylim}},
                expand = F) + 
       theme(axis.text = element_blank())
   } else {
     map_plot <- map_plot  + 
       coord_sf(label_graticule = 'SW', label_axes = '--EN',
                crs = CRS(projection),
-               xlim = xlim,#{if (!is.null(xlim)) {xlim}},
-               ylim = ylim,#{if (!is.null(ylim)) {ylim}},#c(-0.63*1e7, 0.77*1e7),
+               xlim = xlim,
+               ylim = ylim,
                expand = F)
   }
   
   map_plot <- map_plot + 
-    scale_x_continuous() +#seq(-90, 90, 90)) + 
-    scale_y_continuous() #seq(-60, 60, 30))
+    scale_x_continuous() +
+    scale_y_continuous()
   
   if (!box) {
     map_plot <- map_plot + 
