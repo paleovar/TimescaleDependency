@@ -32,7 +32,6 @@ additional files | description
 `license.md`/ `license.html` | Licensing information
 `readme.md` | General README
 
-
 ## Prerequisites
 
 Our code requires the following [R](https://www.r-project.org/) packages (loaded in `./helpers/init.R`):
