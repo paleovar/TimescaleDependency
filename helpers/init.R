@@ -1,3 +1,4 @@
+#load required packages
 library(dplyr)
 library(RColorBrewer)
 library(ggplot2)
@@ -10,16 +11,12 @@ library(PaleoSpec)
 library(tibble)
 select <- dplyr::select
 
+#load meta data
 signal_tbb <- readRDS("helpers/signal_tbb.Rds")
-model <- c(signal_tbb %>% filter(type=="model") %>% select(signal))$signal
-obs <- c(signal_tbb %>% filter(type=="obs") %>% select(signal))$signal
-signal <- c(model, obs)
 
-#graphical parameters
+#graphical parameters for plotting
 pointsize=0.4
-#textsize=9
 notationsize=3
-
 theme_td <- function(textsize=9){
   theme_classic(base_size=textsize) +
     theme(axis.title = element_text(size = textsize),
@@ -33,8 +30,3 @@ theme_td <- function(textsize=9){
           legend.text = element_text(size=textsize),
           legend.key.height = unit(0.2, "cm")) 
 }
-
-t2 <- readRDS("helpers/signal_tbb.Rds")
-t <- readRDS("helpers/meta_res.Rds")
-t <- inner_join(t, t2)
-saveRDS(t, "helpers/signal_tbb.Rds")

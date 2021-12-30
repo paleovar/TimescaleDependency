@@ -1,6 +1,10 @@
 source("helpers/init.R")
 source("helpers/functions.R")
 meta.res_tbb <-readRDS("helpers/meta_res.Rds") %>% select(signal, interp.res)
+model <- c(signal_tbb %>% filter(type=="model") %>% select(signal))$signal
+obs <- c(signal_tbb %>% filter(type=="obs") %>% select(signal))$signal
+signal <- c(model, obs)
+
 GMST <- readRDS("data/GMST_tbb.Rds")
 
 split <- function(tibble){

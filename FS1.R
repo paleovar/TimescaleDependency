@@ -1,5 +1,8 @@
 source("helpers/init.R")
 source("helpers/functions.R")
+model <- c(signal_tbb %>% filter(type=="model") %>% select(signal))$signal
+obs <- c(signal_tbb %>% filter(type=="obs") %>% select(signal))$signal
+signal <- c(model, obs)
 
 #FS1
 library(cowplot)
