@@ -49,7 +49,7 @@ Our code requires the following [R](https://www.r-project.org/) packages (loaded
 
 Creating some of the figures additionally requires (separately loaded in the corresponding `.R` scripts):
 
-- `cowplot`, `forcats`, `ggnewscale`, `sp`, `viridisLite`, `raster`, `ggcorrplot`, `ggridges`, `grid`, `gridExtra`
+- `cowplot`, `forcats`, `ggnewscale`, `sp`, `viridisLite`, `raster`, `ggcorrplot`, `ggridges`, `grid`, `gridExtra`, `irr`
 - `nest` (can be obtained from `https://github.com/krehfeld/nest`, using `devtools::install_github()`)
 - `rgdal` (in case you encounter difficulties installing the package, this might help: https://gist.github.com/dncgst/111b74066eaea87c92cdc5211949cd1e)
 - `sf` (in case you encounter difficulties installing the package, this might help: https://r-spatial.github.io/sf/)
