@@ -1,35 +1,3 @@
-#' @title Reverse log transform
-#'
-#' @description everse log transformation for plotting in logarithmic space. Useful when plotting power spectral densities.
-#' adapted from the metR package https://rdrr.io/cran/metR/src/R/reverselog_trans.R by Elio Campitelli
-#' Part of PTBox https://palmodapp.cloud.dkrz.de/index.php/ptbox/
-#'
-#' @param base Base of the logarithm, default value 10
-#'
-#' @examples 
-#' # 
-#' ggplot(t, aes(p, t)) + 
-#' geom_line() +
-#' coord_flip() +
-#' scale_x_continuous(trans = "reverselog")
-#' 
-#' the base can easily changed: 
-#' ggplot(t, aes(p, t)) + 
-#' geom_line() +
-#' coord_flip() +
-#' scale_x_continuous(trans = reverselog_trans(10))
-#' #'
-#' @family ggplot2 helpers
-#' @export
-reverselog_trans <- function(base = 10) {
-  trans <- function(x) -log(x, base)
-  inv <- function(x) base^(-x)
-  scales::trans_new(paste0("reverselog-", format(base)), trans, inv, 
-            scales::log_breaks(base = base), 
-            domain = c(1e-100, Inf))
-}
-
-#--------------------------------------------------------------#
 
 #' @title Mean Spectrum
 #' @description Wrapper for the PaleoSpec::MeanSpectrum function. We introduced a correction to the number of records, 
@@ -40,7 +8,6 @@ reverselog_trans <- function(base = 10) {
 #' @param weights vector of weights (same length as elements in speclist)
 #' @return list(spec,nRecords) spec=average spectrum, nRecords = number of records contributing to each spectral estimate
 #' @export
-
 MeanSpec <- function(specList, iRemoveLowest = 1, weights = rep(1, length(specList))){
   meanspec <- PaleoSpec::MeanSpectrum(specList, iRemoveLowest, weights)
   meanspec$spec$spec <- meanspec$spec$spec * length(specList)/meanspec$nRecord
@@ -48,18 +15,22 @@ MeanSpec <- function(specList, iRemoveLowest = 1, weights = rep(1, length(specLi
   return(meanspec)
 }
 
-
 #--------------------------------------------------------------#
 
 #' @title PSD plot
-#' @description plots the power spectral density in log-log space.
+#' @description Plots the power spectral density in log-log space.
 #' Part of PTBox https://palmodapp.cloud.dkrz.de/index.php/ptbox/
 #' @param tibble nested tibble (name, data) with column Spec(freq, spec, dof, lim.1, lim.2) is the nested spectrum
 #' @param main title
 #' @param name.y y-axis label
 #' @param name.x x-axis label
-#' @param name.data name of the nested spectrum column, i.e. either "Spec" or "Smooth_spec"
-#' @return ggplot
+#' @param name.data string, name of the nested spectrum column, i.e. either "Spec" or "Smooth_spec"
+#' @param name.col string, grouping feature for colored lines
+#' @param name.fill string, grouping feature for filled confidence bands
+#' @param name.line string, grouping feature for linetype
+#' @param name.alpha string, grouping feature for transparence of filled ribbons
+#' @param conf.band TRUE / FALSE denotes whether confidence bands of spectra are plotted or not
+#' @return ggplot object
 #' @export
 plot_spec <- function(tibble, ylims, xlims, name.y=TeX('PSD $S(\\tau)\\, (K^2 yr)$ '), name.x=TeX('period $\\tau\\,(yr)$'), name.data = "data", name.col="signal", name.fill=NULL, name.line=NULL, name.alpha=NULL, conf.bands=T){
     if(is.null(name.fill)){name.fill<-name.col}
@@ -84,14 +55,15 @@ plot_spec <- function(tibble, ylims, xlims, name.y=TeX('PSD $S(\\tau)\\, (K^2 yr
     }
 
 #--------------------------------------------------------------#
-#' @title
-#' @description 
-#' @param
-#' @param
-#' @param 
-#' @return 
+#' @title Variance computation by integration of the spectrum
+#' @description Simple computation of variance on frequency intervals by integration of the spectrum, akin to PaleoSpec::GetVarRatio(), 
+#' but without consideration of degrees of freedom not needed here
+#' @param spec tibble or list with freq and spec column
+#' @param f target frequency interval c(f1,f2) 
+#' @param dfreq default NULL, if not NULL spectra are interpolated with dfreq before computing the variance
+#' @return  returns variance
 #' @export
-GetVar <- function (spec, f, dfreq = NULL, df.log = 0, bw = 3) 
+GetVar <- function (spec, f, dfreq = NULL) 
 {
   if (f[1] >= f[2]) 
     stop("f1 must be < f2")
@@ -120,12 +92,12 @@ GetVar <- function (spec, f, dfreq = NULL, df.log = 0, bw = 3)
 }
 
 #--------------------------------------------------------------#
-#' @title
-#' @description 
-#' @param
-#' @param
-#' @param 
-#' @return 
+#' @title Color ramp palette with transparency 
+#' @description Color ramp palette with transparency. Taken from https://rdrr.io/github/JBrenn/Helper4me/man/colorRampAlpha.html
+#' @param ... arguments to pass to colorRampPalette
+#' @param n  	number of colors in palette
+#' @param alpha alpha channel (opacity) value [0;1]
+#' @return vector of defined colors with transparency interpolating the given sequence
 #' @export
 colorRampAlpha <- function(..., n, alpha) {
   colors <- colorRampPalette(...)(n)
@@ -133,14 +105,11 @@ colorRampAlpha <- function(..., n, alpha) {
 }
 
 
-
 #--------------------------------------------------------------#
-#' @title
-#' @description 
-#' @param
-#' @param
-#' @param 
-#' @return 
+#' @title Equidistant timeseries from tibble
+#' @description  Wrapper for applying PaleoSpec::MakeEquidistant() to a tibble with data column that contains the timeseries
+#' @param y tibble object with nested data column
+#' @return tibble object with two nested tibble. The "data" column the raw data and the "EquiTS" contains the equidistant timeseries. 
 #' @export
 equidistant <- function(y){
   cnt <- 0
@@ -156,19 +125,19 @@ equidistant <- function(y){
                                  tmpdf %>% as_tibble()
                                }
                                )
-  ) #%>% select(model, interp.res, EquiTS)
+  ) 
   return(y_equi)
 }
 
 #--------------------------------------------------------------#
-#' @title
-#' @description 
-#' @param
-#' @param
-#' @param 
-#' @return 
+#' @title Computing the spectrum over a tibble
+#' @description wrapper for cmputing the spectrum from a tibble using the PaleoSpec pacakge
+#' @param y tibble with data EquiTS column that contains interpolated time series
+#' @param k a positive integer, the number of tapers, often 2*nw.
+#' @param nw a positive double precision number, the time-bandwidth parameter.
+#' @return tibble with nested spectrum
 #' @export
-tibble_spec <- function(y, k, nw){
+tibble_spec <- function(y, k=3, nw=2){
   cnt <- 0
   y_spec <- y %>% add_column(Spec =
                                .$EquiTS %>% lapply(., function(x){
@@ -188,7 +157,7 @@ tibble_spec <- function(y, k, nw){
                                      }
                                    }
                                    target <- target - mean(target)
-                                   restmp <- SpecMTM(target, k=k, nw=nw, detrend=TRUE)
+                                   restmp <- SpecMTM(target, k, nw, detrend=TRUE)
                                    tmpdf[[i]] <- restmp$spec
                                  } 
                                  tmpdf[["freq"]] <- restmp$freq
@@ -196,45 +165,56 @@ tibble_spec <- function(y, k, nw){
                                  tmpdf %>% as_tibble()
                                }
                                )
-  ) #%>% select(model, interp.res, Spec)
+  )
   return(y_spec)
 }
 
-#' @title
-#' @description 
-#' @param
-#' @param
-#' @param 
-#' @return 
+#--------------------------------------------------------------#
+#' @title Reverse log transform
+#' @description reverse log transformation for plotting in logarithmic space. Useful when plotting power spectral densities.
+#' adapted from the metR package https://rdrr.io/cran/metR/src/R/reverselog_trans.R by Elio Campitelli
+#' Part of PTBox https://palmodapp.cloud.dkrz.de/index.php/ptbox/
+#' @param base Base of the logarithm, default value 10
+#' @return axis object
 #' @export
-tibble_to_list <- function(tibble_spec_obj){
-  tmp <- as.list(tibble_spec_obj)
-  #names(tmp$Spec) <- tmp$model
-  tmp$model <- NULL
-  tmp$interp.res <- NULL
-  lapply(tmp$Spec, function(x){
-    x <- as.list(x)
-    if ("temp" %in% names(x)){
-      x$spec <- x$temp
-      x$temp <- NULL
-    }
-    if ("dR" %in% names(x)){
-      x$spec <- x$dR
-      x$dR <- NULL
-    }
-    x$temp <- NULL
-    class(x) <- "spec"
-    return(x)
-  }
-  )
+reverselog_trans <- function(base = 10) {
+  trans <- function(x) -log(x, base)
+  inv <- function(x) base^(-x)
+  scales::trans_new(paste0("reverselog-", format(base)), trans, inv, 
+            scales::log_breaks(base = base), 
+            domain = c(1e-100, Inf))
 }
 
-#' @title
-#' @description 
-#' @param
-#' @param
-#' @param 
-#' @return 
+#--------------------------------------------------------------#
+#' @title Tibble spec to speclist converter
+#' @description Converts a tibble with nested tibbles that contain the spectrum to a list with objects of class "spec" 
+#' @param tibble_spec_obj tibble object that contains the spectrum
+#' @param name.data name of the tibble column that contains the spectral information
+#' @return list of objects of class "spec"
+#' @export
+tibble_to_list <- function(tibble_spec_obj, name.data="Spec"){
+  tmp <- as.list(tibble_spec_obj)
+  tmp$model <- NULL
+  tmp$interp.res <- NULL
+  res <- lapply(tmp[[name.data]], function(x){
+  x <- as.list(x)
+  n <- names(x)
+  idx <- which(!names(x) %in% c("dof", "freq", "f", "lim.1", "lim.2"))
+  n[[idx]] <- "spec"
+  names(x) <- n
+  class(x) <- "spec"
+  return(x)
+   }
+  )
+  return(res)
+}
+
+#--------------------------------------------------------------#
+#' @title Speclist to tibble spec converter
+#' @description Converts a list with objects of class "spec" to tibble with nested tibbles that contain the spectrum. 
+#' Inverts the tibble_to_list() functions.
+#' @param list_spec_obj  list of objects of class "spec"
+#' @return tibble object that contains the spectrum
 #' @export
 list_to_tibble <- function(list_spec_obj){
   
@@ -243,7 +223,7 @@ list_to_tibble <- function(list_spec_obj){
   for (i in 1:length(list_spec_obj)){
     
     if(class(list_spec_obj[[i]])=="zoo"){
-      time <- index(list_spec_obj[[i]]) #convert to CE
+      time <- index(list_spec_obj[[i]])
       temp <- coredata(list_spec_obj[[i]])
       list_spec_obj[[i]] <- list(time=time, temp=temp)
     }
@@ -258,38 +238,15 @@ list_to_tibble <- function(list_spec_obj){
   return(df)
 }
 
-#' @title
-#' @description 
-#' @param
-#' @param
-#' @param 
-#' @return 
-#' @export
-cut <- function(target, from, to, index=FALSE)
-{
-  if (index==FALSE){
-    target <- lapply(target, function(x) x[max(which.min(abs(1/target$freq - from)), 0):min(which.min(abs(1/target$freq - to)), length(target$freq))])
-    class(target) <- "spec"
-    return(target)
-  }
-  if (index==TRUE)
-  {
-    target <- lapply(target, function(x) x[from:to])
-    class(target) <- "spec"
-    return(target)
-  }
-}
-
-#' @title
-#' @description 
-#' @param
-#' @param
-#' @param 
-#' @return 
+#--------------------------------------------------------------#
+#' @title Surrogate Proxies with powerlaw scaling
+#' @description Generate proxy surrogates with the same temporal resolution and beta scaling using PaleoSpec::SimPowerlaw() and PaleoSpec::AvgToBin()
+#' @param diffs temporal resolution of proxies, e.g. computed from diff(index(zoo object))
+#' @param beta scaling coefficient
+#' @return list() object with the sample timeseries and simulated powerlaw spectrum
 #' @export
 sample_from_proxy <- function(diffs, beta){
   #get temporal resolution of proxy records
-
   #simulate time series with powerlaw scaling, resolution of 1 year and same length as proxy 
   powerlaw <- PaleoSpec::SimPowerlaw(beta, ceiling(sum(diffs)))
 
@@ -306,3 +263,26 @@ sample_from_proxy <- function(diffs, beta){
   if(any(unique(index(df)) != index(df))){print("non-unique")}
   return(list(sample=df, powerlaw=powerlaw))
 }
+
+
+##' @title
+##' @description 
+##' @param
+##' @param
+##' @param 
+##' @return 
+##' @export
+#cut <- function(target, from, to, index=FALSE)
+#{
+#  if (index==FALSE){
+#    target <- lapply(target, function(x) x[max(which.min(abs(1/target$freq - from)), 0):min(which.min(abs(1/target$freq - to)), length(target$freq))])
+#    class(target) <- "spec"
+#    return(target)
+#  }
+#  if (index==TRUE)
+#  {
+#    target <- lapply(target, function(x) x[from:to])
+#    class(target) <- "spec"
+#    return(target)
+#  }
+#}
