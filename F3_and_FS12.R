@@ -1,27 +1,31 @@
 source("helpers/stacymap.R")
 source("helpers/init.R")
 
+#--------------------------------------------------------------#
 #F3
+#load data and meta data
 pages <- readRDS("data/beta_N100.Rds") %>% filter(signal=="pages2k")
 tbb <- readRDS("data/scaling_tbb.Rds")
 signal_tbb <-readRDS("helpers/signal_tbb.Rds")
 model_names <- (signal_tbb %>% filter(type=="model") %>% filter(!signal %in% c("MPI-M_highres", "CESM_LM_highres")) %>% dplyr::select(signal))$signal
 
+#initialize lists
 plots_cen <- list()
 plots <- list()
 plots_slopesd <- list()
 
+#prepare input point layer for stacymap.R
 points_tbb <- pages %>% ungroup() %>% rename(layer=slope) %>% dplyr::select(long, lat, layer, Archive)
-
+#correct for beta convention (LR assumes $S(f) ~ f^(\beta)$, however, typically \beta is defined via $S(tau) ~ \tau^\beta$)
 points_tbb$layer <- (-1)*points_tbb$layer
-
 points_tbb <- arrange(points_tbb, by=lat)
 idx <- which(abs(diff(points_tbb$long)) <5)[which(abs(diff(points_tbb$long)) <5) %in% which(abs(diff(points_tbb$lat))<5)]
 
+#the location of closeby points is varied slightly (i.e. "jittered") to facilitate visualisatiion and avoid too large overlaps
 points_tbb$long[idx] <- jitter(points_tbb$long[idx], factor=1.5)
 points_tbb$lat[idx] <- jitter(points_tbb$lat[idx], factor=1.5)
 
-
+#create individual plots for every model simulation and store them in a list
 for(n in model_names){
   subset <- tbb %>% group_by(scale) %>% filter(scale=="cen") %>% filter(model==n) %>% rename(long = lon) 
   
@@ -58,6 +62,7 @@ for(n in model_names){
     theme(plot.title = element_text(size = 9, face="bold", hjust=0.5))
 }
 
+#define climate zones and assigne latitudes to it
 zones <- tibble(name=c("pole.N", "temperate.N", "tropics.N", "tropics.S", "temperate.S", "pole.S"),
                 lat.1=c(90, 60, 30, 0, -30, -60),
                 lat.2=c(60, 30, 0, -30, -60, -90))
@@ -71,6 +76,7 @@ match.zones <- function(zones=zones, lat){
   return(z)
 }
 
+#compute zonal mean values of scaling coefficients 
 zonmean <- function(value, lats){
   w.lats <- cos(lats*pi/180)/sum(cos(lats*pi/180))
   tavg <- sum(w.lats*value,na.rm=TRUE)
@@ -91,6 +97,7 @@ for(i in 1:length(tbb_list)){
 }
 tbb <- bind_rows(tbb_list) %>% ungroup()
 
+#create plots of zonal mean \beta values
 plots_lat <- list()
 for(i in model_names){
   if(!i%in%c("IPSL", "Trace21k")){
@@ -114,6 +121,7 @@ for(i in model_names){
   }
 }
 
+#define parameters of final plot
 w1 <- 3
 w2 <- 1.75
 b <- 0.4
@@ -122,6 +130,7 @@ t <- 0.2
 r <- 0
 null_width <- -0.05
 
+#merge zonal means and maps together in one main plot
 prow <- cowplot::plot_grid(
   NULL,
   NULL,
@@ -203,6 +212,7 @@ prow <- cowplot::plot_grid(
   rel_heights = c(2, 4, 4, 4, 4, 4.2, 0.5)#,
 )
 
+#get legend
 legend1 <- cowplot::get_legend(
   plots_cen$CESM + guides(fill= guide_legend(title=TeX("$\\beta$"), title.vjust = GLOBAL_STACY_OPTIONS$GLOBAL_LEG_TITLE_VJUST,
                                              ncol = 9, direction = 'horizontal', label.position = 'bottom', order=1), 
@@ -211,12 +221,14 @@ legend1 <- cowplot::get_legend(
           legend.title = element_text(size=11, face="plain"))
 )
 
+#generate main plot
 cowplot::ggdraw() +
   cowplot::draw_plot(prow, scale=1, vjust=-0.09) +
   cowplot::draw_plot(legend1, vjust=0.46)
 
-#---------------------#
+#--------------------------------------------------------------#
 #FS12
+#For the supplementary Figure FS12, repeat the map plotting part for standard deviations of beta
 prow <- cowplot::plot_grid(
   plots_slopesd$HadCM3 + theme(legend.position="none", axis.title.x=element_blank(),
                            axis.text.x=element_blank(), plot.margin = unit(c(0.1, 0.1, -0.2, 0.1), "cm")),   plots_slopesd$CESM + theme(legend.position="none", axis.title.x=element_blank(),
@@ -245,6 +257,7 @@ prow <- cowplot::plot_grid(
   nrow = 4
 )
 
+#get legend
 legend1 <- cowplot::get_legend(
   plots_slopesd$CESM + guides(fill= guide_legend(title=TeX("std. $\\Delta \\beta$"),
                                              direction = 'horizontal', label.position = 'bottom', order=1)) +
@@ -252,6 +265,7 @@ legend1 <- cowplot::get_legend(
           legend.title = element_text(size=11, face="plain"))
 )
 
+#generate main plot
 cowplot::ggdraw() +
   cowplot::draw_plot(prow, 0, 0, 1, 1) +
   cowplot::draw_plot(legend1, 0.42, -0.13, .5, .5)

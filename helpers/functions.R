@@ -1,4 +1,6 @@
 
+
+#--------------------------------------------------------------#
 #' @title Mean Spectrum
 #' @description Wrapper for the PaleoSpec::MeanSpectrum function. We introduced a correction to the number of records, 
 #' in case spectra where only partially overlapping.
@@ -16,7 +18,6 @@ MeanSpec <- function(specList, iRemoveLowest = 1, weights = rep(1, length(specLi
 }
 
 #--------------------------------------------------------------#
-
 #' @title PSD plot
 #' @description Plots the power spectral density in log-log space.
 #' Part of PTBox https://palmodapp.cloud.dkrz.de/index.php/ptbox/
