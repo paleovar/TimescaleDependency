@@ -17,6 +17,7 @@ signal_tbb <- readRDS("helpers/signal_tbb.Rds")
 #graphical parameters for plotting
 pointsize=0.4
 notationsize=3
+#ggplot theme 
 theme_td <- function(textsize=9){
   theme_classic(base_size=textsize) +
     theme(axis.title = element_text(size = textsize),
