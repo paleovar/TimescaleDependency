@@ -1,16 +1,16 @@
-#---------------------#
-#FS3
 source("helpers/init.R")
 source("helpers/functions.R")
+#--------------------------------------------------------------#
+#FS3
+
 tbb <- readRDS("data/pages_meta_scaling.Rds")
-
-#pages.prxlist <- readRDS(paste0(pages.dir, "/pages.prxlist_", min.res, "_", min.range, "_", max.hiat, ".Rds"))
 pages.prxlist <- readRDS("data/proxylist.Rds") %>% inner_join(., tbb,  by="Name") 
-
+#process data for plotting
 pages.prxlist$data2 <- lapply(pages.prxlist$data, function(x) tibble(time=index(x) / 1000, val=coredata(x) - mean(na.approx(coredata(x)))))
-  
 dat <- pages.prxlist %>% unnest(data2)
+rm(pages.prxlist)
 
+#plot temperature anomalys
 ggplot(dat, aes(x=time, y=val)) + 
     geom_line(size=0.1) + xlab("time (kyr CE)") + ylab(TeX("Temperature anomaly (K)")) + geom_line(size=0.1) +
     scale_x_continuous( labels = scales::number_format(accuracy = 0.1), expand=c(0.1,0.1)) +
@@ -18,13 +18,16 @@ ggplot(dat, aes(x=time, y=val)) +
     theme_td() + 
     theme(legend.position = "none") + facet_wrap(~ID, scales = "free_x") 
 
-#---------------------#
+#--------------------------------------------------------------#
 #FS4
+#load data
 tmp_spec <- readRDS("data/proxy_spectra.Rds") 
 
+#plotting parameters
 yrs.period <- rev(c(0.0001, 0.001, 0.01,  0.1, 1, 10, 100, 1000, 10000, 100000, 1000000))
 yrs.labels <- rev(c(TeX('$10^{-4}$'),TeX('$10^{-3}$'), TeX('$10^{-2}$'), TeX('$10^{-1}$'), TeX('$10^{0}$'), TeX('$10^{1}$'), TeX('$10^{2}$'), TeX('$10^{3}$'), TeX('$10^{4}$'), TeX('$10^{5}$'), TeX('$10^{6}$')))
 
+#plot spectra
 ggplot(tmp_spec %>% unnest(Spec)) + 
     facet_wrap(~ID) +
     geom_line(aes(x=1/freq, y=temp),color="black", size=0.1) +

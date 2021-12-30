@@ -1,15 +1,16 @@
 source("helpers/init.R")
 source("helpers/functions.R")
 library(nest)
+library(ggcorrplot)
 
+#load data
 tbb <- readRDS("data/beta_N100.Rds")
 pages.prxlist <- readRDS("data/proxylist.Rds") %>% inner_join(., tbb %>% filter(signal=="pages2k"), by="Name") 
-
 N <- length(pages.prxlist$data)
 
+#compute correlations
 mat.nexcf_ci <- matrix(data=NA, nrow=N, ncol=N)
 mat.nexcf_p <- matrix(data=NA, nrow=N, ncol=N)
-
 for(i in 1:N){
   print("i=")
   print(i)
@@ -29,8 +30,7 @@ for(i in 1:N){
   }
 }
 
-library(ggcorrplot)
-
+#create correlation plot matrix
 ggcorrplot(mat.nexcf_ci, type = "lower",
            outline.col = "white", pch.cex =1,
            p.mat = mat.nexcf_p, sig.level = 0.05) + 

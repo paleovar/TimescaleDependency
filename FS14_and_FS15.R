@@ -1,10 +1,14 @@
 source("helpers/init.R")
 
+#--------------------------------------------------------------#
 #FS14
+#load data
 res <- readRDS("data/supp/lr_mle_comp_N200_samples6000.Rds")
 beta_seq <- seq(-1, 3, by=0.5)
-rmse <- res %>% unnest(data) %>% mutate(dev = ((-1)*beta-slope)**2) %>% group_by(beta, method) %>% summarise(mean=mean(dev), sd_mean=mean(slopesd)) %>% filter(method %in% c("MLE_Rlaw", "LR"))
+rmse <- res %>% unnest(data) %>% mutate(dev = ((-1)*beta-slope)**2) %>% group_by(beta, method) %>% 
+  summarise(mean=mean(dev), sd_mean=mean(slopesd)) %>% filter(method %in% c("MLE_Rlaw", "LR"))
 
+#plot comparison
 ggplot(rmse, aes(x=beta)) + geom_point(aes(y=sqrt(mean), shape=method), size=2) + theme_td() +
   scale_x_continuous(limits = c(min(beta_seq), max(beta_seq)), breaks=c(rev(beta_seq)), labels=c(rev(beta_seq)),
     expand = c(0.05, 0.05), sec.axis = dup_axis(name = NULL, labels = NULL)) +
@@ -21,10 +25,13 @@ ggplot(rmse, aes(x=beta)) + geom_point(aes(y=sqrt(mean), shape=method), size=2) 
   scale_shape(solid=T) +
   scale_shape_manual(values=c(17, 15), breaks=c("LR", "MLE_Rlaw"), labels=c("LR", "MLE"))
 
-#---------------------#
-#FS15    
+#--------------------------------------------------------------#
+#FS15 
+#load data   
 res <- readRDS("data/supp/lr_mle_comp_beta_irr_N200.Rds")
+pages.meta <- readRDS("data/pages_meta_scaling.Rds")
 
+#prepare data for plotting
 tbb1 <- res %>% unnest(data) %>% group_by(Name, beta) %>% 
   dplyr::summarise(slope_lr_sd=sd(slope_lr),
                    slope_glr_sd=sd(slope_glr),
@@ -34,7 +41,6 @@ tbb1 <- res %>% unnest(data) %>% group_by(Name, beta) %>%
                           method=="slope_lr"| method=="slope_lr_sd" ~ "LR",
                           method=="slope_glr"| method=="slope_glr_sd" ~ "GLR",
                             TRUE ~ method))
-
 tbb2 <- res %>% unnest(data) %>% group_by(Name, beta) %>% 
   dplyr::summarise(slope_lr=mean(slope_lr), 
                    slope_glr=mean(slope_glr),
@@ -46,10 +52,9 @@ tbb2 <- res %>% unnest(data) %>% group_by(Name, beta) %>%
                           method=="slope_lr"| method=="slope_lr_sd" ~ "LR",
                           method=="slope_glr"| method=="slope_glr_sd" ~ "GLR",
                             TRUE ~ method))
-
 tbb <- inner_join(tbb1, tbb2)
 
-pages.meta <- readRDS("data/pages_meta_scaling.Rds")
+#create plot
 ggplot(tbb %>% inner_join(., pages.meta) %>% filter(!method=="GLR") %>% arrange(ID) %>% 
          mutate(method=case_when(method=="MLE (Rlaw)" ~ "MLE", TRUE ~method))
          ) + 

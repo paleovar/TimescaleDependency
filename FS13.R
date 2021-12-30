@@ -1,12 +1,13 @@
 source("helpers/init.R")
 source("helpers/functions.R")
+
+#load requierd data, define parameters
 meta.res_tbb <-readRDS("helpers/meta_res.Rds") %>% select(signal, interp.res)
 model <- c(signal_tbb %>% filter(type=="model") %>% select(signal))$signal
 obs <- c(signal_tbb %>% filter(type=="obs") %>% select(signal))$signal
 signal <- c(model, obs)
-
 GMST <- readRDS("data/GMST_tbb.Rds")
-
+#define function to split timeseries 
 split <- function(tibble){
     tibble <-  rowid_to_column(tibble, "ID")
     tbb1 <- tibble %>% filter(signal %in% c(signal_tbb %>% filter(type=="obs"&signal!="pages2k") %>% select(signal))$signal|grepl("highres",signal))
@@ -18,13 +19,11 @@ split <- function(tibble){
     return(res)
 }
 
+#split timeseries and compute spectra
 GMST <- inner_join(GMST, GMST %>% unnest(data) %>% group_by(signal) %>% summarise(cut_time=(min(time)+max(time))/2))
-
 GMST_equi <- GMST %>% left_join(., meta.res_tbb) %>% mutate(interp.res = replace_na(interp.res, 1)) %>% 
   split %>% equidistant %>% select(signal, interp.res, EquiTS, cut_time, split)
-
 GMST_spec <- tibble_spec(GMST_equi, 3, 2) %>% select(signal, interp.res, Spec, cut_time, split)
-
 res <- tibble()
 for(i in c("early", "late")){
   speclist <- tibble_to_list(GMST_spec %>% filter(split==i))
@@ -37,17 +36,18 @@ for(i in c("early", "late")){
   speclist_smoothed_tbb <- list_to_tibble(speclist_smoothed) %>% add_column(split=i)
   res <- rbind(res, speclist_smoothed_tbb)
 }
-
 res <- res %>% filter(!model %in% c("MPI-M_cont", "CESM_LM_cont")) %>% rename(., signal=model) %>%
   inner_join(., signal_tbb) %>% 
   arrange(., signal) %>% arrange(., type)
 
+#define plotting parameters
 levels <- res %>% group_by(signal, type)  %>% select(-data) %>% filter(split=="early") %>% arrange(., order) 
 cntlevels <- levels %>% group_by(type) %>% filter(split=="early") %>% count() 
 cut_colors <-setNames(c(rev(brewer.pal(cntlevels[which(cntlevels$type=="model"),]$n+1, "YlGnBu"))[1:cntlevels[which(cntlevels$type=="model"),]$n], rev(brewer.pal(cntlevels[which(cntlevels$type=="obs"),]$n +1, "OrRd")[2:(cntlevels[which(cntlevels$type=="obs"),]$n+1)]), "grey70"), c(levels$signal, "mean"))
-
 yrs.period <- rev(c(0.0001, 0.001, 0.01,  0.1, 1, 10, 100, 1000, 10000, 100000, 1000000))
 yrs.labels <- rev(c(TeX('$10^{-4}$'),TeX('$10^{-3}$'), TeX('$10^{-2}$'), TeX('$10^{-1}$'), TeX('$10^{0}$'), TeX('$10^{1}$'), TeX('$10^{2}$'), TeX('$10^{3}$'), TeX('$10^{4}$'), TeX('$10^{5}$'), TeX('$10^{6}$')))
+
+#create plot
 res %>% filter(!signal %in% c("HadCM3", "Trace21k_orb")) %>% unnest("data") %>%
         ggplot(aes(x = 1/freq, y = spec)) + 
         facet_wrap(~signal, nrow=2) +

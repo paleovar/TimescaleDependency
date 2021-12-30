@@ -1,8 +1,10 @@
 source("helpers/init.R")
 source("helpers/functions.R")
+#load data
+l <- readRDS("data/transfer.Rds") #gain
+l_raw <- readRDS("data/sample_spec.Rds") #spectra
 
-l <- readRDS("data/transfer.Rds")
-
+#plot sampled gain
 sample_gain <- l %>% rename(lim.1=sd_down, lim.2=sd_up, signal=name, spec=m) %>% group_by(signal) %>% nest() %>% 
   plot_spec(ylims=c(0.001, 1), xlims=c(370, 2.1),name.y=TeX('gain G^2 ($\\tau$) ($K^2/(W^2 m^{-4})$)')) + 
           geom_hline(aes(x=1/freq, yintercept=var, color=signal), linetype="dashed") +
@@ -12,11 +14,9 @@ sample_gain <- l %>% rename(lim.1=sd_down, lim.2=sd_up, signal=name, spec=m) %>%
           annotate("text",x = c(280), y=c(0.9), label = c("(b)"), size=notationsize) +
           theme(legend.position=c(0.27, 0.18)) + 
           guides(color=guide_legend(override.aes=list(fill=NA)))
-
 print(sample_gain)
 
-l_raw <- readRDS("data/sample_spec.Rds")
-
+#plot sampled mean spectra
 sample_raw <- l_raw %>% rename(lim.1=sd_down, lim.2=sd_up, signal=name, spec=m) %>% group_by(signal) %>% nest() %>%
  plot_spec(xlims=c(370, 2.1), ylims=c(5e-4, 50)) + 
   scale_color_manual(values=c("#009966", "grey70",  "#6699cc", "#ffcc65"), labels=c(unname(TeX("joint forcing")), unname(TeX("model simulations $(M_0, M_+)$")), unname(TeX("model simulations $(M_0)$")),  unname(TeX("observation-based"))), 
@@ -34,9 +34,9 @@ sample_raw <- l_raw %>% rename(lim.1=sd_down, lim.2=sd_up, signal=name, spec=m) 
   annotate("text",x = c(10), y=c(8), label = expression(S[F]), size=notationsize) +
   annotate("text",x = c(10), y=c(0.1), label = expression(S[T]), size=notationsize) +
   guides(color=guide_legend(override.aes=list(fill=NA)))
-
 print(sample_raw)
 
+#plot altogether
 cowplot::plot_grid(
   sample_raw + 
   theme(axis.text.x = element_blank(), axis.title.x=element_blank()),
