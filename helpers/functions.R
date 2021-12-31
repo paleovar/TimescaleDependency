@@ -264,26 +264,3 @@ sample_from_proxy <- function(diffs, beta){
   if(any(unique(index(df)) != index(df))){print("non-unique")}
   return(list(sample=df, powerlaw=powerlaw))
 }
-
-
-##' @title
-##' @description 
-##' @param
-##' @param
-##' @param 
-##' @return 
-##' @export
-#cut <- function(target, from, to, index=FALSE)
-#{
-#  if (index==FALSE){
-#    target <- lapply(target, function(x) x[max(which.min(abs(1/target$freq - from)), 0):min(which.min(abs(1/target$freq - to)), length(target$freq))])
-#    class(target) <- "spec"
-#    return(target)
-#  }
-#  if (index==TRUE)
-#  {
-#    target <- lapply(target, function(x) x[from:to])
-#    class(target) <- "spec"
-#    return(target)
-#  }
-#}
