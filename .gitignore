@@ -5,5 +5,5 @@
 *.pdf
 *.svg
 .Rproj.user
-raw_data/*
+processing/raw_data/*
 *.nc
