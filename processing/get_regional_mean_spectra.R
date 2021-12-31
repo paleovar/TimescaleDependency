@@ -1,12 +1,11 @@
 
 source("helpers/init.R")
 source("helpers/functions.R")
+source("processing/functions_processing.R")
 meta.res_tbb <- readRDS("helpers/meta_res.Rds")
 save <- F
 
 signal <- signal_tbb %>% filter(type=="model") %>% select(signal)
-k=3
-nw=2
 
 RMST <-list()
 for(n in signal[2,]){

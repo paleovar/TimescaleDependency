@@ -19,7 +19,6 @@ speclist$pages2k <- MeanSpec(pages2k_spectra)$spec
 
 speclist <- lapply(speclist, function(x) PaleoSpec::AddConfInterval(x))
 
-gregorian_year <- 365.2425
 for(i in c("MPI-M_highres", "CESM_LM_highres", "ERA5_highres")){
   speclist[[i]] <- cut(speclist[[i]], from=1/2, to=1/(gregorian_year*1.5), index=FALSE)
 }

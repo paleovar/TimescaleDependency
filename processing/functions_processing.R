@@ -1,3 +1,12 @@
+#processing parameters
+
+k=3
+nw=2
+gregorian_year <- 365.2425
+get_min.res <- function(tscales=c(200,10)){min(tscales)}
+get_min.range <- function(tscales=c(200,10)){max(tscales)*3}
+get_max.hiat <- function(tscales=c(200,10)){min(tscales)*5}
+
 ##cut_warming <- function(tibble, cut_time=2020, cut=F){
 #  if(cut==FALSE){return(tibble)}
 #  if(cut==TRUE){
