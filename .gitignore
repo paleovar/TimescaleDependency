@@ -5,5 +5,5 @@
 *.pdf
 *.svg
 .Rproj.user
-cache/*
-figures/*
+raw_data/*
+*.nc
