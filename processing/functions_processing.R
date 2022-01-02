@@ -1,5 +1,4 @@
 #processing parameters
-
 k=3
 nw=2
 gregorian_year <- 365.2425
@@ -7,24 +6,14 @@ get_min.res <- function(tscales=c(200,10)){min(tscales)}
 get_min.range <- function(tscales=c(200,10)){max(tscales)*3}
 get_max.hiat <- function(tscales=c(200,10)){min(tscales)*5}
 
-##cut_warming <- function(tibble, cut_time=2020, cut=F){
-#  if(cut==FALSE){return(tibble)}
-#  if(cut==TRUE){
-#    tibble <-  rowid_to_column(tibble, "ID")
-#    tbb1 <- tibble %>% filter(signal %in% c(signal_tbb %>% filter(type=="obs"&signal!="pages2k") %>% select(signal))$signal|grepl("highres",signal))
-#    tbb2 <- tibble %>% filter(!signal %in% tbb1$signal) %>% 
-#      mutate(data = purrr::map(data, ~ filter(., time <= cut_time)))
-#    res <- rbind(tbb1, tbb2) %>% arrange(ID) %>% select(-ID)
-#    return(res)
-#  }
-#}
-
-#' @title
-#' @description 
-#' @param
-#' @param
-#' @param 
-#' @return 
+#--------------------------------------------------------------#
+#' @title Extract part of spectrum
+#' @description Extract part of spectrum
+#' @param target spectrum that needs to be cutted 
+#' @param from starting point
+#' @param to end point
+#' @param index FALSE / TRUE indicates whether "from" and "to" refer to an index or a period (in years)
+#' @return object of class "spec"
 #' @export
 cut <- function(target, from, to, index=FALSE){
   if (index==FALSE){
@@ -40,11 +29,25 @@ cut <- function(target, from, to, index=FALSE){
   }
 }
 
-
+#--------------------------------------------------------------#
+#' @title get nth element of a vector
+#' @description nth element of a vector
+#' @param vector target object
+#' @param starting_postition integer
+#' @param n nth element counted from starting poistion
+#' @return numeric() 
+#' @export
 nth_element <- function(vector, starting_position, n) { 
   vector[seq(starting_position, length(vector), n)] 
 }
 
+#--------------------------------------------------------------#
+#' @title Spline interpolation of the spectrum
+#' @description  Spline interpolation of the spectrum, similar to PaleoSpec::SpecInterpolate()
+#' @param freqRef target frequencies (vector)
+#' @param spec object of class "spec" with freq, spec and dof list
+#' @return object of class spec
+#' @export
 SpecInterpolateSpline <- function (freqRef, spec) {
   result <- list()
   result$freq <- freqRef

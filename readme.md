@@ -10,7 +10,7 @@ This repository provides code to reproduce the figures of **"Probing the timesca
 
 **Contact:** beatrice.ellerhoff(at)iup.uni-heidelberg.de
 
-Please see `./license.md` for terms of use. This repository contains the **maintained code and pre-processed data** to create the figures of *Ellerhoff and Rehfeld (2021)*. The raw data will be soon (after the holiday season) archived on [Zenodo](https://www.zenodo.org/), together with the code to generate the pre-processed data. 
+Please see `./license.md` for terms of use. This repository contains the **maintained code and pre-processed data** to create the figures of *Ellerhoff and Rehfeld (2021)*. The raw data will be soon (after the holiday season) archived on [Zenodo](https://www.zenodo.org/), together with the code to generate the pre-processed data. It is therefore important to note, that the subfolder (`./processing`) is not complete yet. However, all figure can be reproduced using the post-processeddata (`./data`).
 
 ## Organisation of this repository
 

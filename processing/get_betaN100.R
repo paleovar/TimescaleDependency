@@ -1,35 +1,25 @@
 source("helpers/init.R")
 source("helpers/functions.R")
 source("processing/functions_processing.R")
-pages.meta <- list()
-prxnames <- list()
-scaling <- list()
-prxlist <- list()
-diffs.norm <- list()
-specs <- list()
-tbb <- list()
+
+#initialization
 results <- list()
 tscales <- c(200, 10)
 min.res = get_min.res(tscales)
 min.range = get_min.range(tscales)
 max.hiat = get_max.hiat(tscales)
 
+#load data
 prxlist <- readRDS("data/proxylist.Rds")
 pages.meta <- readRDS("data/pages_meta_scaling.Rds")
 specs <- readRDS("data/proxy_spectra.Rds")
 scaling <- readRDS("data/scaling_tbb.Rds") %>% filter(model=="pages2k") %>% filter(scale=="cen") %>% rename(Lon=lon, Lat=lat)
-  
-  pdata <- readRDS(paste0(dir, "/data/pages2k/PAGES2k_v2.0.0.Rds"))
-  prxlist <- readRDS(paste0(pages.dir, "pages.prxlist_", min.res, "_", min.range, "_", max.hiat, ".Rds"))
-  pages.meta<- readRDS(paste0(pages.dir, "pages.meta_", scale, "_", round(min.res,3), "_", round(min.range,2), "_", round(max.hiat,2), ".Rds"))
-  prxnames <- pdata[which(names(pdata) %in% as.character(pages.meta$Name))]
-  specs <- readRDS(paste0(pages.dir, "speclist_pages2k_", scale, "_", round(min.res,3), "_", round(min.range,2), "_", round(max.hiat,2), ".Rds")) %>% select(Name, Archive, Proxy, interp.res)
-
 df <- prxlist %>% mutate(diffs=purrr::map(data, function(x) diff(index(x)))) %>% select(-data)
 tbb <- inner_join(df, specs)
 tbb <- inner_join(tbb, scaling)
 
-#needs a tibble with  Name, slope, interp.res, data=diffs  
+#Sampling the uncertainties of the scaling coefficients
+N=100
 results <- replicate(N, 
                  {
     #create artificial proxy with (sample) and without (powerlaw) block averaging
@@ -72,7 +62,4 @@ results <- replicate(N,
   ) 
   names(tmp) <- c(names(results[,1]), "Name")   
   results <- tmp
-
-
-#if(save){saveRDS(results, paste0("/stacytools/tonks/spec2k/results/", exp, "/stat_N", N, "_beta_new.rds"))}
-#-------------------------------------------------#
+  }

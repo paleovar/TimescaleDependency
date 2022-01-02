@@ -4,11 +4,13 @@ source("helpers/functions.R")
 source("processing/functions_processing.R")
 meta.res_tbb <- readRDS("helpers/meta_res.Rds")
 save <- F
-
 signal <- signal_tbb %>% filter(type=="model") %>% select(signal)
 
+#comput local mean spectra for specific simulation (i)
+i <- 1 #CHOOSE DATA SETS HERE (calculation can require substantial memory and computing power)
+
 RMST <-list()
-for(n in signal[2,]){
+for(n in signal[i,]){
     speclist <- list()
     speclist_lat <- list()    
     print(n)
@@ -45,3 +47,5 @@ for(n in signal[2,]){
     rm(speclist_lat, speclist)
     gc()
 }
+
+#### NOTE: regional mean spectra of HadCRUT4 and pages2k will be computed separately in another script
