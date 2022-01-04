@@ -7,6 +7,31 @@ get_min.range <- function(tscales=c(200,10)){max(tscales)*3}
 get_max.hiat <- function(tscales=c(200,10)){min(tscales)*5}
 
 #--------------------------------------------------------------#
+#' @title
+#' @description 
+#' @param target spectrum that needs to be cutted 
+#' @param from starting point
+#' @param to end point
+#' @param index FALSE / TRUE indicates whether "from" and "to" refer to an index or a period (in years)
+#' @return object of class "spec"
+#' @export
+get_restrictions <- function(x){
+  if(x == "strong"){
+    min.res = 20
+    max.hiat = 40 #floor(min.res*2)
+    length.min = 30
+    min.range= 30 #length.min
+  }
+  if(x == "loose"){
+    min.res = 80
+    max.hiat = 160 #floor(min.res*2)
+    length.min = 20
+    min.range= 20 #length.min
+  }
+  return(list("min.res"=min.res, "max.hiat"=max.hiat, "min.range"=min.range, "length.min"=length.min))
+}
+
+#--------------------------------------------------------------#
 #' @title Extract part of spectrum
 #' @description Extract part of spectrum
 #' @param target spectrum that needs to be cutted 
