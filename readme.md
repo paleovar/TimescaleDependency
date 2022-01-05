@@ -54,6 +54,9 @@ Creating some of the figures additionally requires (separately loaded in the cor
 - `rgdal` (in case you encounter difficulties installing the package, this might help: https://gist.github.com/dncgst/111b74066eaea87c92cdc5211949cd1e)
 - `sf` (in case you encounter difficulties installing the package, this might help: https://r-spatial.github.io/sf/)
 
+Generating some of the pre-processed data in `./processing` (using data from Zenodo) might further require:
+- `ncdf4`
+
 ## Data references
 
 This manuscript is based upon data provided by the World Climate Research Programme’s Working Group on Coupled Modelling, which is responsible for CMIP and
