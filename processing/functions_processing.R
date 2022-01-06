@@ -1,3 +1,10 @@
+#model parameters
+names_echam <- c("ECHAM5", "Trace21k", "MPI-M")
+echam_weights <- 0.
+control_runs <- c("CESM_LM_cont", "MPI-M_cont", "Trace21k_orb")
+control_runs_weights <- 0
+
+#--------------------------------------------------------------#
 #processing parameters
 k=3
 nw=2

@@ -39,10 +39,6 @@ speclist_smoothed$ERA5 <- MeanSpec(list(cut(speclist_smoothed$ERA5, from=2000, t
 speclist_smoothed$ERA5_highres <- NULL
 
 #exclude some of the spectra from forming the mean (see methods of "Ellerhoff and Rehfeld (2021)")
-names_echam <- c("ECHAM5", "Trace21k", "MPI-M")
-echam_weights <- 0.
-control_runs <- c("CESM_LM_cont", "MPI-M_cont", "Trace21k_orb")
-control_runs_weights <- 0
 w <- rep(1, length(names(speclist_smoothed)))
 w[which(names(speclist_smoothed) %in% names_echam)] <- echam_weights
 w[which(names(speclist_smoothed) %in% control_runs)] <- control_runs_weights
