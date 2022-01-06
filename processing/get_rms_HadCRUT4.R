@@ -1,10 +1,3 @@
-source("helpers/init.R")#
-source("helpers/functions.R")
-library(ncdf4)
-
-#define parameters
-hadcrut.len <- 150
-
 #load data
 ncf <- ncdf4::nc_open("processing/raw_data/HadCRUT.4.6.0.0.anomalies.1.nc")
 

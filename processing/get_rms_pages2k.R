@@ -1,8 +1,3 @@
-source("helpers/init.R")
-source("helpers/functions.R")
-source("processing/functions_processing.R")
-library(nest)
-
 cut_warming_pages <- function(tibble, cut_time=2020, cut=FALSE, length.min=length.min){
   if(cut==FALSE){return(tibble)}
   if(cut==TRUE){
@@ -105,7 +100,6 @@ rm(check.prxlist, locs, meta, meta.pages, pdata, prxlist, prxlist.pages, hiat, d
 gc()
 
 #compute regional mean spectra for pages2k
-RMST <- list()
 lats <- prxtbbspec$Lat
 w.lats <- cos(lats*pi/180)/sum(cos(lats*pi/180))
-RMST$pages2k <- MeanSpec(tibble_to_list(speclist), weights=w.lats)
+RMST$pages2k <- MeanSpec(tibble_to_list(prxtbbspec), weights=w.lats)
