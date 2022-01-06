@@ -10,7 +10,6 @@ w[which(speclist_smoothed_tbb$signal %in% names_echam)] <- echam_weights
 w[which(speclist_smoothed_tbb$signal %in% control_runs)] <- control_runs_weights
 w[which(speclist_smoothed_tbb$signal %in% obs)] <- 0
 
-
 speclist_smoothed <- tibble_to_list(speclist_smoothed_tbb, name.data="data")
 names(speclist_smoothed) <- speclist_smoothed_tbb$signal
 
@@ -31,5 +30,3 @@ for(i in 1:1000){
   l[[i]]$lim.2 <- NULL
 }
 
-LPlot(l[[20]])
-length(l)
