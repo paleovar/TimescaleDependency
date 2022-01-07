@@ -163,7 +163,7 @@ if(transfer_raw){
 }
 
 
-l <- readRDS("data/transfer.Rds") #gain
+l <- readRDS(paste0("data/transfer.Rds") #gain
 l_raw <- readRDS("data/sample_spec.Rds") #spectra
 
 for(i in names(sample_raw)){
