@@ -88,3 +88,83 @@ SpecInterpolateSpline <- function (freqRef, spec) {
   class(result) <- "spec"
   return(result)
 }
+
+
+#--------------------------------------------------------------#
+#' @title 
+#' @description  
+#' @param freqRef
+#' @param spec
+#' @return
+#' @export
+transferSpec <- function (specList, input=input.spec, output=output.spec, iRemoveLowest = 1){
+  remove.lowestFreq <- function (spec, iRemove){ 
+    {
+      if (iRemove == 0) 
+        index = seq(spec$spec)
+      else index <- (-(1:iRemove))
+      spec$spec <- spec$spec[index]
+      spec$freq <- spec$freq[index]
+      spec$dof <- spec$dof[index]
+      return(spec)
+    }
+  }
+  get.fend.existing <- function (x){
+    return(max(x$freq[!is.na(x$spec)]))
+  }
+  get.fstart.existing <- function (x) {
+    return(min(x$freq[!is.na(x$spec)]))
+  }
+  get.df <- function (x){
+    return(mean(diff(x$freq)))
+  }
+  AddConfInterval_Fdist <- function(transferspec, var.dof1, var.dof2, pval = 0.05){ 
+    {
+      if (!(length(transferspec$spec) == length(var.dof1)) && (!length(transferspec$spec) == 
+                                                               length(var.dof2))) {
+        stop("same lengths must be provided")
+      }
+      if (!(is.numeric(transferspec$spec)) || !(is.numeric(var.dof1)) || 
+          !is.numeric(var.dof2)) {
+        stop("non-numeric arguments")
+      }
+      res <- matrix(NA, nrow = length(transferspec$spec), ncol = 2)
+      for (i in 1:length(transferspec$spec)) {
+        QF <- qf(p = c(pval/2, (1 - pval/2)), df1 = var.dof1[i], 
+                 df2 = var.dof2[i])
+        tmp <- QF * transferspec$spec[i]
+        res[i, ] <- tmp
+      }
+      transferspec$lim.1 <- res[,2]
+      transferspec$lim.2 <- res[,1]
+      class(transferspec) <- "spec"
+      return(transferspec)
+    }
+  }
+  specList <- lapply(specList, remove.lowestFreq, iRemove = iRemoveLowest)
+  freqRef <- seq(from = min(unlist(lapply(specList, get.fstart.existing))), 
+                 to = max(unlist(lapply(specList, get.fend.existing))), 
+                 by = min(unlist(lapply(specList, get.df))))
+  specList.interpolated <- list()
+  for (i in 1:length(specList)) specList.interpolated[[i]] <- SpecInterpolate(freqRef, 
+                                                                              specList[[i]])
+  NSpectra <- length(specList.interpolated)
+  result <- list(freq = specList.interpolated[[1]]$freq, spec = rep(0, 
+                                                                    length(specList.interpolated[[1]]$spec)))
+  specMatrix <- matrix(NA, NSpectra, length(specList.interpolated[[1]]$spec))
+  dofMatrix <- matrix(NA, NSpectra, length(specList.interpolated[[1]]$spec))
+  for (i in 1:length(specList.interpolated)) {
+    if (sum((result$freq - specList.interpolated[[i]]$freq)^2) > 
+        0.1) 
+      stop("Different spectra length or resolutions")
+    specMatrix[i, ] <- specList.interpolated[[i]]$spec
+    dofMatrix[i, ] <- specList.interpolated[[i]]$dof
+  }
+  
+  var.dof1 <- dofMatrix[output, ]
+  var.dof2 <- dofMatrix[input,]
+  result$spec <- mapply('/', specMatrix[output, ], specMatrix[input, ]) #na.rm=TRUE
+  result <- AddConfInterval_Fdist(result, dofMatrix[output, ], dofMatrix[input,])
+  class(result) <- "spec"
+  return(list(spec = result))
+}
