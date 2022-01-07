@@ -1,3 +1,7 @@
+if(!exists("RMST")){
+  RMST <- list()
+}
+
 #load data
 ncf <- ncdf4::nc_open("processing/raw_data/HadCRUT.4.6.0.0.anomalies.1.nc")
 

@@ -1,3 +1,8 @@
+if(!exists("RMST")){
+  RMST <- list()
+}
+
+
 cut_warming_pages <- function(tibble, cut_time=2020, cut=FALSE, length.min=length.min){
   if(cut==FALSE){return(tibble)}
   if(cut==TRUE){
