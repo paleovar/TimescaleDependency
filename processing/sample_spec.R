@@ -42,7 +42,7 @@ resp_models_wENSO <- samples$models_wENSO
 resp_models_woENSO <- samples$models_woENSO
 
 
-N_sample <- 50
+N_sample <- 50 #be carful with changing this parameter. It requires a lot of computing time to go to a larger number of samples
 sample_raw <- list()
 for(transfertarget in c("recons","forc", "models_woENSO", "models_wENSO")){
     l <- list()
@@ -97,7 +97,7 @@ for(transfertarget in c("recons","forc", "models_woENSO", "models_wENSO")){
     )
 }
 
-N_sample <- 50
+N_sample <- 50 #be carful with changing this parameter. It requires a lot of computing time to go to a larger number of samples
 sample_transfer <- list()
 for(transfertarget in c("recons","forc", "models_woENSO", "models_wENSO")){
     l <- list()
@@ -150,22 +150,6 @@ for(transfertarget in c("recons","forc", "models_woENSO", "models_wENSO")){
     )
 }
 
-
-if(sample_transfer){
-if(save){
-  saveRDS(test, paste0(dir, "/paper/results/sampling/transfer_", transfertarget, "_new.Rds"))
-}
-}
-if(transfer_raw){
-  if(save){
-    saveRDS(test, paste0(dir, "/paper/results/sampling/raw_", transfertarget, "_new.Rds"))
-  }
-}
-
-
-l <- readRDS(paste0("data/transfer.Rds") #gain
-l_raw <- readRDS("data/sample_spec.Rds") #spectra
-
 for(i in names(sample_raw)){
     sample_raw[[i]] <- sample_raw[[i]] %>% add_column(name=i)
 }
@@ -173,22 +157,11 @@ for(i in names(sample_transfer)){
     sample_transfer[[i]] <- sample_transfer[[i]] %>% add_column(name=i)
 }
 
-    yrs.period <- rev(c(0.0001, 0.001, 0.01,  0.1, 1, 10, 100, 1000, 10000, 100000, 1000000))
-    yrs.labels <- rev(c(TeX('$10^{-4}$'),TeX('$10^{-3}$'), TeX('$10^{-2}$'), TeX('$10^{-1}$'), TeX('$10^{0}$'), TeX('$10^{1}$'), TeX('$10^{2}$'), TeX('$10^{3}$'), TeX('$10^{4}$'), TeX('$10^{5}$'), TeX('$10^{6}$')))
-    
-sample_raw$forc %>% 
-    ggplot() +
-    #geom_ribbon(aes(x=1/freq, ymin=lim.1, ymax=lim.2, fill=Name), alpha=0.3) +
-    geom_line(aes(x=1/freq, y = m), size=pointsize) +
-    geom_line(aes(x=1/freq, y = sd_up), col="red", size=1) +
-    geom_line(aes(x=1/freq, y = sd_down), col="red", size=1) +
-    # geom_line(data= forc_speclist_smoothed_tbb_orb %>% unnest(data), aes(x=1/freq, y = spec, color=forcing), size=pointsize) +
-    # scale_color_manual(values=cut_colors, labels=c("orbital", "CO2", "solar", "volcanic", "GMST")) +
-    #  guides(fill=FALSE) +
-    #  scale_fill_manual(values=cut_colors) + 
-    #scale_linetype_manual(values=c("solid", "solid")) +
-    scale_y_log10(labels = trans_format("log10", math_format(10^.x)), name=TeX('power spectral density ($W^2 m^{-4} yr$)'), 
-                    expand=c(0.05, 0.05),  sec.axis = dup_axis(name = NULL, labels = NULL))  + #limits=c(1e-9, 10),
-    scale_x_continuous(trans=reverselog_trans(10), breaks = yrs.period, labels = yrs.labels,   
-                        expand=c(0.05, 0.05), name=TeX('time period ($yr$)'), sec.axis = dup_axis(name = NULL, labels = NULL)) + #limits=c(1e3, 1e-3),
-    theme(legend.position="none") 
+bind_rows()
+rbind()
+
+if(save){
+    saveRDS(sample_raw, paste0("data/transfer_", N_sample, ".Rds"))
+    saveRDS(sample_transfer, paste0("data/sample_spec_", N_sample, ".Rds"))
+}
+
