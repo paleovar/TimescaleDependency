@@ -1,3 +1,8 @@
+if(!exists("samples")){
+  samples <- list()
+}
+
+
 # LARGELY TAKEN FROM: Neukom, Raphael; Barboza, Luis A.; Erb, Michael P.; Shi, Feng; Emile-geay, Julien; Evans, Michael N.; et al. (2019): 
 # Global mean temperature reconstructions over the Common Era. figshare. Collection. https://doi.org/10.6084/m9.figshare.c.4507043.v2 
 #-------------------------------#
@@ -5,11 +10,6 @@
 ### The original code serves to generate Figures for GMST reconstruction paper: PAGES2k Consortium (2019); Nature Geoscience. RN 2019/03/29
 
 #functions & definitions ------------------------------------------------
-library(zoo)
-library(scales)
-library(parallel)
-source("processing/raw_data/pages2k/R-functions_gmst.R")
-
 ### read a table containing a time series, first column = years
 read.ts<-function(filename,sep=";",header=T,skip=0){
   ind<-as.matrix(read.table(filename,sep=sep,header=header,skip=skip))
@@ -23,9 +23,13 @@ tsapply<-function(x,dim,fun){
 }
 
 #folder with reconstruction outputs
-recons.folder<- "processing/raw_data/pages2k/"
+recons.folder <- "processing/raw_data/pages2k/"
 
-experiment.names<-c("CPS","PCR","M08","PAI","OIE","BHM","DA")
+experiment.names <-c("CPS","PCR","M08","PAI","OIE","BHM","DA")
+
+#reference period
+start.ref<-1770
+end.ref<-1850
 
 ##read in the reconstructions------------------------
 nexp<-length(experiment.names)
@@ -47,8 +51,4 @@ s <- function(x){PaleoSpec::SpecMTM(x, k=3, nw=2, detrend=TRUE)}
 
 specs <- lapply(recons, function(x) apply(x, 2, s))
 
-if(save){
-    saveRDS(specs, "processing/raw_data/pages2k/sample_recons.Rds")
-}
-
-
+samples$recons <- specs

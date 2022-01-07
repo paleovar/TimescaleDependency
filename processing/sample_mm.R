@@ -1,6 +1,7 @@
-source("helpers/init.R")
-source("helpers/functions.R")
-source("processing/functions_processing.R")
+if(!exists("samples")){
+  samples <- list()
+}
+
 speclist_smoothed_tbb <- readRDS("data/global_mean_spectra.Rds")
 
 obs <- c(signal_tbb %>% filter(type=="obs"))$signal
@@ -30,3 +31,6 @@ for(i in 1:1000){
   l[[i]]$lim.2 <- NULL
 }
 
+samples$models <- l
+rm(l)
+gc()
