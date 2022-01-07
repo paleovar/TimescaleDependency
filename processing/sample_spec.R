@@ -41,11 +41,12 @@ resp_recons2$hadCRUT <- cut(resp_recons2$hadCRUT, from=13, to=length(resp_recons
 resp_models_wENSO <- samples$models_wENSO
 resp_models_woENSO <- samples$models_woENSO
 
-l <- list()
-N_sample <- 50
 
+N_sample <- 50
 sample_raw <- list()
-for(transfertarget %in% c("recons","forc", "models_woENSO", "models_wENSO")){
+for(transfertarget in c("recons","forc", "models_woENSO", "models_wENSO")){
+    l <- list()
+    print(transfertarget)
     for(i in 1:N_sample){
         specList <- list()
         if(transfertarget == "forc"){
@@ -78,7 +79,7 @@ for(transfertarget %in% c("recons","forc", "models_woENSO", "models_wENSO")){
         l[[i]] <- specList[[1]]
         l[[i]]$lim.1 <- NULL
         l[[i]]$lim.2 <- NULL
-        LPlot(l[[i]])
+        #LPlot(l[[i]])
         
         comp_forc$sol <- NULL
         comp_forc$vol <- NULL
@@ -88,17 +89,19 @@ for(transfertarget %in% c("recons","forc", "models_woENSO", "models_wENSO")){
     l <- lapply(l, function(x) cut(x, 500, 2, index=FALSE))
     names(l) <- as.character(seq(1:length(t)))
 
-    sample_raw[[transfertarget]] <- list_to_tibble(l) %>% unnest(data) %>% group_by(freq)  %>% summarize(
+    sample_raw[[transfertarget]] <- list_to_tibble(l) %>% unnest(data) %>% group_by(freq)  %>% 
+    summarize(
     m = mean(spec, na.rm=TRUE),  
     sd_up = quantile(spec, c(0.95), na.rm=TRUE),
     sd_down = quantile(spec, c(0.05), na.rm=TRUE)
     )
 }
 
-l <- list()
 N_sample <- 50
 sample_transfer <- list()
-for(transfertarget %in% c("recons","forc", "models_woENSO", "models_wENSO")){
+for(transfertarget in c("recons","forc", "models_woENSO", "models_wENSO")){
+    l <- list()
+    print(transfertarget)
     for(i in 1:N_sample){
         if(transfertarget=="forc"){next}
     specList <- list()
@@ -130,7 +133,7 @@ for(transfertarget %in% c("recons","forc", "models_woENSO", "models_wENSO")){
     l[[i]] <- transferSpec(specList, input=1, output=2)$spec
     l[[i]]$lim.1 <- NULL
     l[[i]]$lim.2 <- NULL
-    LPlot(l[[i]])
+    #LPlot(l[[i]])
     
     comp_forc$sol <- NULL
     comp_forc$vol <- NULL
@@ -148,8 +151,6 @@ for(transfertarget %in% c("recons","forc", "models_woENSO", "models_wENSO")){
 }
 
 
-
-
 if(sample_transfer){
 if(save){
   saveRDS(test, paste0(dir, "/paper/results/sampling/transfer_", transfertarget, "_new.Rds"))
@@ -165,15 +166,17 @@ if(transfer_raw){
 l <- readRDS("data/transfer.Rds") #gain
 l_raw <- readRDS("data/sample_spec.Rds") #spectra
 
-
-
-t <- 
-
+for(i in names(sample_raw)){
+    sample_raw[[i]] <- sample_raw[[i]] %>% add_column(name=i)
+}
+for(i in names(sample_transfer)){
+    sample_transfer[[i]] <- sample_transfer[[i]] %>% add_column(name=i)
+}
 
     yrs.period <- rev(c(0.0001, 0.001, 0.01,  0.1, 1, 10, 100, 1000, 10000, 100000, 1000000))
     yrs.labels <- rev(c(TeX('$10^{-4}$'),TeX('$10^{-3}$'), TeX('$10^{-2}$'), TeX('$10^{-1}$'), TeX('$10^{0}$'), TeX('$10^{1}$'), TeX('$10^{2}$'), TeX('$10^{3}$'), TeX('$10^{4}$'), TeX('$10^{5}$'), TeX('$10^{6}$')))
     
-    test %>% 
+sample_raw$forc %>% 
     ggplot() +
     #geom_ribbon(aes(x=1/freq, ymin=lim.1, ymax=lim.2, fill=Name), alpha=0.3) +
     geom_line(aes(x=1/freq, y = m), size=pointsize) +

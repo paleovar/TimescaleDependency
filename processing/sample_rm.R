@@ -52,3 +52,6 @@ s <- function(x){PaleoSpec::SpecMTM(x, k=3, nw=2, detrend=TRUE)}
 specs <- lapply(recons, function(x) apply(x, 2, s))
 
 samples$recons <- specs
+
+rn(specs, recons, recons.folder, experiment.names, em.ref, em, filename)
+gc()

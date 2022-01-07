@@ -24,7 +24,7 @@ for(i in 1:N){
     #l$mean$dof <- NULL
   l[[i]]$lim.1 <- NULL
   l[[i]]$lim.2 <- NULL
-  LPlot(l[[i]])
+ # LPlot(l[[i]])
 }
 
 samples$volc <- l
@@ -48,11 +48,11 @@ for(i in 1:N){
   #l$mean$dof <- NULL
   l[[i]]$lim.1 <- NULL
   l[[i]]$lim.2 <- NULL
-  LPlot(l[[i]])
+#  LPlot(l[[i]])
 }
 
 samples$sol <- l
-rm(l)
+rm(l, spec_sel_list, spec_sel, summary, w)
 gc()
 
 

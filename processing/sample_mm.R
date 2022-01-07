@@ -44,3 +44,5 @@ for(wENSO in c(T,F)){
   rm(l)
   gc()
 }
+
+rm(w, speclist, speclist_smoothed, speclist_smoothed_tbb, wENSO, w, obs)
