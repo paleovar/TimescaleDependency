@@ -2,12 +2,13 @@ source("helpers/init.R")
 source("helpers/functions.R")
 source("processing/functions_processing.R")
 
-#be patient with the following lines
+#be patient with the following lines: sampling of spectra
 samples <- list()
 source("processing/sample_fm.R")
 source("processing/sample_rm.R")
 source("processing/sample_mm.R")
 
+#load and process data
 forc_co2_orb <- rbind(
     readRDS("data/forcing_spectra.Rds") %>% filter(Name == "meanco2") %>% 
     unnest(data) %>% filter(freq < 9/12) %>% group_by(Name) %>% nest() %>% ungroup()
@@ -24,9 +25,6 @@ comp_forc <- lapply(as.list(forc_co2_orb)$data, function(x){
 )
 names(comp_forc) <- forc_co2_orb$Name
 
-
-N <- 100
-
 forc_sol <- samples$sol
 forc_vol <- samples$vol
 
@@ -41,9 +39,10 @@ resp_recons2$hadCRUT <- cut(resp_recons2$hadCRUT, from=13, to=length(resp_recons
 resp_models_wENSO <- samples$models_wENSO
 resp_models_woENSO <- samples$models_woENSO
 
-
+#Sampling of the mean spectra and the gain 
 N_sample <- 50 #be carful with changing this parameter. It requires a lot of computing time to go to a larger number of samples
 sample_raw <- list()
+#GAIN
 for(transfertarget in c("recons","forc", "models_woENSO", "models_wENSO")){
     l <- list()
     print(transfertarget)
@@ -99,6 +98,7 @@ for(transfertarget in c("recons","forc", "models_woENSO", "models_wENSO")){
 
 N_sample <- 50 #be carful with changing this parameter. It requires a lot of computing time to go to a larger number of samples
 sample_transfer <- list()
+#SPECTRA
 for(transfertarget in c("recons","forc", "models_woENSO", "models_wENSO")){
     l <- list()
     print(transfertarget)
@@ -157,8 +157,7 @@ for(i in names(sample_transfer)){
     sample_transfer[[i]] <- sample_transfer[[i]] %>% add_column(name=i)
 }
 
-bind_rows()
-rbind()
+#rbind
 
 if(save){
     saveRDS(sample_raw, paste0("data/transfer_", N_sample, ".Rds"))
