@@ -2,14 +2,14 @@ if(!exists("samples")){
   samples <- list()
 }
 
+#load data
 summary <- readRDS("data/forcing_tbb.Rds")
 
+#get combinations of volcanic foring
 samples <- list()
 l <- list()
 len <- nrow(summary %>% filter(unit=="AOD"))
-
 N <- 100
-
 for(i in 1:N){
   aod_convert <- sample(-18:-25, 1, replace = TRUE)
   w <- sample(0:1000, len, replace = TRUE)/1000
@@ -26,20 +26,17 @@ for(i in 1:N){
   l[[i]]$lim.2 <- NULL
  # LPlot(l[[i]])
 }
-
+#write data to list
 samples$volc <- l
 rm(l)
 gc()
 
-#--------------solar-----------#
-
+#get combinations of solar forcing
 spec_sel <- summary %>% filter(forcing=="sol", unit %in% c("abs dR", "anom dR"), Name!= "sol_fro") %>% 
   mutate(interp.res = as.numeric(purrr::map(data, ~mean(diff(.$time))))) %>% 
   equidistant() %>% tibble_spec(., k, nw) %>% select(forcing, Name, interp.res, Spec)
-
 spec_sel_list <- spec_sel %>% tibble_to_list() %>% lapply(., function(x) AddConfInterval(x))
 names(spec_sel_list) <- spec_sel$Name 
-
 l <- list()
 len <- length(names(spec_sel_list))
 for(i in 1:N){
@@ -50,7 +47,7 @@ for(i in 1:N){
   l[[i]]$lim.2 <- NULL
 #  LPlot(l[[i]])
 }
-
+#write data to list
 samples$sol <- l
 rm(l, spec_sel_list, spec_sel, summary, w)
 gc()
