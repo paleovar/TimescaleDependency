@@ -43,7 +43,7 @@ resp_models_woENSO <- samples$models_woENSO
 N_sample <- 50 #be carful with changing this parameter. It requires a lot of computing time to go to a larger number of samples
 sample_raw <- list()
 #GAIN
-for(transfertarget in c("recons","forc", "models_woENSO", "models_wENSO")){
+for(transfertarget in c("forc", "models_woENSO", "models_wENSO")){ #"recons",
     l <- list()
     print(transfertarget)
     for(i in 1:N_sample){
@@ -157,10 +157,12 @@ for(i in names(sample_transfer)){
     sample_transfer[[i]] <- sample_transfer[[i]] %>% add_column(name=i)
 }
 
-#rbind
+sample_raw <- bind_rows(lapply(names(sample_raw), function(x) sample_raw[[x]] %>% add_column(name=x)))
+sample_transfer <- bind_rows(lapply(names(sample_transfer), function(x) sample_transfer[[x]] %>% add_column(name=x)))
 
 if(save){
     saveRDS(sample_raw, paste0("data/transfer_", N_sample, ".Rds"))
     saveRDS(sample_transfer, paste0("data/sample_spec_", N_sample, ".Rds"))
 }
+
 
