@@ -150,13 +150,6 @@ for(transfertarget in c("recons","forc", "models_woENSO", "models_wENSO")){
     )
 }
 
-for(i in names(sample_raw)){
-    sample_raw[[i]] <- sample_raw[[i]] %>% add_column(name=i)
-}
-for(i in names(sample_transfer)){
-    sample_transfer[[i]] <- sample_transfer[[i]] %>% add_column(name=i)
-}
-
 sample_raw <- bind_rows(lapply(names(sample_raw), function(x) sample_raw[[x]] %>% add_column(name=x)))
 sample_transfer <- bind_rows(lapply(names(sample_transfer), function(x) sample_transfer[[x]] %>% add_column(name=x)))
 
