@@ -1,6 +1,7 @@
 source("helpers/init.R")
 source("helpers/functions.R")
 source("processing/functions_processing.R")
+library(purrr)
 
 #initialization
 results <- list()

@@ -2,6 +2,7 @@ source("helpers/init.R")
 source("helpers/functions.R")
 source("processing/functions_processing.R")
 scaling <- list()
+coord <- list()
 #get pages_meta_scaling
 #get proxy_spectra
 #get proxylist
@@ -19,9 +20,9 @@ if(get_proxies){
     length.min = 30
     #filter proxies and compute spectrum
     source("processing/get_rms_pages2k.R")
-    #print(length(pages.meta$ID))
-    #saveRDS(pages.meta, paste0(pages.dir,  "pages.meta_", scale, "_", round(min.res,3), "_", round(min.range,2), "_", round(max.hiat,2), ".Rds"))
-    #saveRDS(pages.prxlist, paste0(pages.dir, "pages.prxlist_", min.res, "_", min.range, "_", max.hiat, ".Rds"))
+    #saveRDS(pages.prxlist, "data/proxylist.Rds")
+    #saveRDS(pages.meta, "data/pages_meta_scaling.Rds")
+    #saveRDS(prxtbbspec, "data/proxy_spectra.Rds")
     rm(min.res, min.range, max.hiat, RMST, w.lats)
     specs <- prxtbbspec %>% select(Name, Lon, Lat, Archive, Proxy, interp.res, Spec)
     coords <- data.frame(long=specs$Lon, lat=specs$Lat)
@@ -40,13 +41,31 @@ if(get_proxies){
         idx <- cbind(idx, i)
         next}  
       
-      scaling[[n]][[scale]][[i]] <- list(slope=fit$slope, slopesd=fit$slopesd)
+      scaling[[n]][[i]] <- list(slope=fit$slope, slopesd=fit$slopesd)
+      
       rm(fit)
     }
-    scaling <- lapply(scaling, function(x) lapply(x, function(x) Filter(length, x)))
-    
+    coord[[n]] <- coords
+    #scaling <- lapply(scaling, function(x) lapply(x, function(x) Filter(length, x)))
+}
 
-
+#If the scaling list is complete, it can be transformed to a tibble (similar to ./data/scaling_tbb.Rds) as follows: 
+scaling_to_list <- function(target, coord){
+  tbb <- tibble(model=character(),
+                slope=numeric(),
+                slopesd=numeric(),
+                Lon=numeric(),
+                Lat=numeric())
+  for(i in names(target)){
+    tbb <- bind_rows(tibble(model=i,
+                            slope=as.numeric(lapply(target[[i]], function(x) x$slope)),
+                            slopesd=as.numeric(lapply(target[[i]], function(x) x$slopesd)),
+                            Lon=as.numeric(coord[[i]]$lon),
+                            Lat=as.numeric(coord[[i]]$lat)),
+                     tbb)
+  }
+  return(tbb)
+}
 
 #model parameters
 meta.res_tbb <- readRDS("helpers/meta_res.Rds")
@@ -81,5 +100,7 @@ for(n in signal[i,]){
         scaling[[n]][[i]] <- list(slope=fit$slope, slopesd=fit$slopesd)
         rm(fit)
       }
+    coord[[n]] <- coords
 }
-names(scaling)
+
+scaling_tbb <- scaling_to_list(scaling, coord)

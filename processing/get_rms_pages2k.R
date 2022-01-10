@@ -26,8 +26,7 @@ meta.names <- c("ID","Name","Lat","Lon","Elev_masl","Archive",
                 "Notes","citekey","NOAA.PANGAEA")
 meta.names.ind.pages <- c(1,2,3,4,5,6,7)
 ind.pages.temp <- which(sapply(1:length(pdata), function(i) !is.null(pdata[[i]]$paleoData[[1]]$paleoMeasurementTable[[1]]$temperature)))
-n <- length(prxlist)
-meta.pages <- data.frame(ID=        sapply(ind.pages.temp, function(i) n+i), #ID
+meta.pages <- data.frame(ID=        sapply(ind.pages.temp, function(i) length(prxlist)+i), #ID
                          Name=      sapply(ind.pages.temp, function(i) names(pdata)[i]), #Name
                          Lat=       sapply(ind.pages.temp, function(i) pdata[[i]]$geo$latitude), #Lat
                          Lon=       sapply(ind.pages.temp, function(i) pdata[[i]]$geo$longitude), #Lon
@@ -75,11 +74,11 @@ if (is.numeric(remid)){
 #nest::qualtiy check
 check.prxlist <- nest:::quality_check(prxlist, meta, T0=-50, T1=8000, maxhiat=floor(min.res*5), length.min=length.min, min.res=min.res, min.range=min.range)
 pages.meta <- check.prxlist$metafilt
-pages.prxlist <- prxlist[check.prxlist$ind.ok]
+prxlist <- prxlist[check.prxlist$ind.ok]
 locs <- data.frame(Name=meta$Name[check.prxlist$ind.ok], Lon=pages.meta$Lon, Lat=pages.meta$Lat)
 
 #cut warming trend if necessary
-prxtbb <- list_to_tibble(pages.prxlist) %>% rename(Name = model) %>% 
+prxtbb <- list_to_tibble(prxlist) %>% rename(Name = model) %>% 
   inner_join(., as_tibble(locs)) %>% inner_join(meta.pages) %>% 
   cut_warming_pages(., cut_time, cut, length.min=length.min)
 
@@ -94,7 +93,7 @@ pages.meta <- pages.meta %>% filter(Name %in% names(hiat[lengths(hiat) == 0L]))
 
 #compute the spectra
 prxtbbspec <- tibble_spec(equidistant(prxtbb), k=3, nw=2)
-rm(check.prxlist, locs, meta, meta.pages, prxlist, pdata, prxlist.pages, hiat, diffs, prxtbb)
+rm(check.prxlist, locs, meta, meta.pages, pdata, prxlist, prxlist.pages, hiat, diffs, prxtbb)
 gc()
 
 #compute regional mean spectra for pages2k
