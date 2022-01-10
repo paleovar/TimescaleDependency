@@ -3,9 +3,6 @@ source("helpers/functions.R")
 source("processing/functions_processing.R")
 scaling <- list()
 coord <- list()
-#get pages_meta_scaling
-#get proxy_spectra
-#get proxylist
 
 get_proxies <- T
 cut <- F
