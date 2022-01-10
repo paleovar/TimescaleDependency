@@ -13,6 +13,8 @@ get_min.res <- function(tscales=c(200,10)){min(tscales)}
 get_min.range <- function(tscales=c(200,10)){max(tscales)*3}
 get_max.hiat <- function(tscales=c(200,10)){min(tscales)*5}
 
+tscale <- list()
+tscale$cen <- c(200, 10)
 #--------------------------------------------------------------#
 #' @title
 #' @description 

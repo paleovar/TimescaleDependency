@@ -2,8 +2,9 @@ if(!exists("RMST")){
   RMST <- list()
 }
 
+pdata <- readRDS("processing/raw_data/PAGES2k_v2.0.0.Rds")
 
-cut_warming_pages <- function(tibble, cut_time=2020, cut=FALSE, length.min=length.min){
+cut_warming_pages <- function(tibble, cut_time, cut, length.min=length.min){
   if(cut==FALSE){return(tibble)}
   if(cut==TRUE){
     res <- tibble %>% mutate(data = purrr::map(data, ~ filter(., time <= cut_time)))
@@ -13,14 +14,6 @@ cut_warming_pages <- function(tibble, cut_time=2020, cut=FALSE, length.min=lengt
     if(length(idx)!=0){return(res[-which(tmp < length.min),])}
   }
 }
-
-#load data and define properties
-pdata <- readRDS("processing/raw_data/Pages2k_v2.0.0.Rds")
-restrictions <- "loose"
-min.res=get_restrictions(restrictions)$min.res
-min.range=get_restrictions(restrictions)$min.range
-max.hiat= get_restrictions(restrictions)$max.hiat
-length.min = get_restrictions(restrictions)$length.min
 
 #Initialize Meta data
 #requires: meta[["Name"]], meta$Lon, meta$Lat, prxlist is a list of zoo objects with index => y BP
@@ -88,7 +81,7 @@ locs <- data.frame(Name=meta$Name[check.prxlist$ind.ok], Lon=pages.meta$Lon, Lat
 #cut warming trend if necessary
 prxtbb <- list_to_tibble(pages.prxlist) %>% rename(Name = model) %>% 
   inner_join(., as_tibble(locs)) %>% inner_join(meta.pages) %>% 
-  cut_warming_pages(., length.min=length.min)
+  cut_warming_pages(., cut_time, cut, length.min=length.min)
 
 #filter for hiatuses (i.e. gaps in the data that are too large)
 hiat <- lapply(lapply(prxtbb$data, function(x) diff(x$time)), function(x) hiatus=which(abs(x)>=max.hiat))
@@ -101,7 +94,7 @@ pages.meta <- pages.meta %>% filter(Name %in% names(hiat[lengths(hiat) == 0L]))
 
 #compute the spectra
 prxtbbspec <- tibble_spec(equidistant(prxtbb), k=3, nw=2)
-rm(check.prxlist, locs, meta, meta.pages, pdata, prxlist, prxlist.pages, hiat, diffs, prxtbb)
+rm(check.prxlist, locs, meta, meta.pages, prxlist, pdata, prxlist.pages, hiat, diffs, prxtbb)
 gc()
 
 #compute regional mean spectra for pages2k

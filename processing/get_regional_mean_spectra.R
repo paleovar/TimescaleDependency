@@ -6,10 +6,18 @@ library(ncdf4)
 save <- F
 RMST <- list()
 
+#load data and define parameters: Pages2k
+cut_time <- 2020
+cut <- FALSE
+restrictions <- "loose"
+min.res=get_restrictions(restrictions)$min.res
+min.range=get_restrictions(restrictions)$min.range
+max.hiat= get_restrictions(restrictions)$max.hiat
+length.min = get_restrictions(restrictions)$length.min
+source("processing/get_rms_pages2k.R")
+
 #hadcrut parameters
 hadcrut.len <- 150
-
-source("processing/get_rms_pages2k.R")
 source("processing/get_rms_HadCRUT4.R")
 
 #model parameters
@@ -19,6 +27,7 @@ signal <- signal_tbb %>% filter(type=="model") %>% select(signal)
 #compute local mean spectra for specific simulation (i)
 i <- 1 #CHOOSE DATA SETS HERE (calculation can require substantial memory and computing power)
 for(n in signal[i,]){
+    n <- as.character(n)
     speclist <- list()
     speclist_lat <- list()    
     print(n)
