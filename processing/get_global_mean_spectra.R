@@ -4,7 +4,7 @@ source("processing/functions_processing.R")
 #load data and meta data
 GMST <- readRDS("data/GMST_tbb.Rds")
 meta.res_tbb <- readRDS("helpers/meta_res.Rds")
-save <- F
+save <- F #!be careful with overwriting the original files
 
 #process global mean spectra
 GMST_equi <- GMST %>% left_join(., meta.res_tbb) %>% mutate(interp.res = replace_na(interp.res, 1)) %>% #cut_warming %>% 
@@ -53,5 +53,5 @@ speclist_smoothed_tbb <- list_to_tibble(speclist_smoothed)
 
 #save global mean spectra
 if(save){
-    saveRDS(speclist_smoothed_tbb, "data/global_mean_spectra.Rds")
+    saveRDS(speclist_smoothed_tbb, "data/global_mean_spectra.Rds") #!be careful with overwriting the original files
 }

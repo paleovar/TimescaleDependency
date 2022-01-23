@@ -3,7 +3,7 @@ source("helpers/functions.R")
 source("processing/functions_processing.R")
 library(nest)
 library(ncdf4)
-save <- F
+save <- F #!be careful with overwriting the original files
 RMST <- list()
 
 #load data and define parameters: Pages2k
@@ -25,7 +25,7 @@ meta.res_tbb <- readRDS("helpers/meta_res.Rds")
 signal <- signal_tbb %>% filter(type=="model") %>% select(signal)
 
 #compute local mean spectra for specific simulation (i)
-i <- 1 #CHOOSE DATA SETS HERE (calculation can require substantial memory and computing power)
+i <- 4 #CHOOSE DATA SETS HERE (calculation can require substantial memory and computing power)
 for(n in signal[i,]){
     n <- as.character(n)
     speclist <- list()
