@@ -43,22 +43,23 @@ if(get_proxies){
       rm(fit)
     }
     coord[[n]] <- coords
-    #scaling <- lapply(scaling, function(x) lapply(x, function(x) Filter(length, x)))
 }
 
 #If the scaling list is complete, it can be transformed to a tibble (similar to ./data/scaling_tbb.Rds) as follows: 
-scaling_to_list <- function(target, coord){
+scaling_to_list <- function(target, coord, scale){
   tbb <- tibble(model=character(),
+                scale=character(),
                 slope=numeric(),
                 slopesd=numeric(),
-                Lon=numeric(),
-                Lat=numeric())
+                lon=numeric(),
+                lat=numeric())
   for(i in names(target)){
     tbb <- bind_rows(tibble(model=i,
+                            scale=scale,
                             slope=as.numeric(lapply(target[[i]], function(x) x$slope)),
                             slopesd=as.numeric(lapply(target[[i]], function(x) x$slopesd)),
-                            Lon=as.numeric(coord[[i]]$lon),
-                            Lat=as.numeric(coord[[i]]$lat)),
+                            lon=as.numeric(paste(coord[[i]]$lon)),
+                            lat=as.numeric(paste(coord[[i]]$lat))),
                      tbb)
   }
   return(tbb)
@@ -69,7 +70,7 @@ meta.res_tbb <- readRDS("helpers/meta_res.Rds")
 signal <- signal_tbb %>% filter(type=="model") %>% select(signal)
 
 #compute local mean spectra for specific simulation (i)
-i <- 1 #CHOOSE DATA SETS HERE (calculation can require substantial memory and computing power)
+i <- 4 #CHOOSE DATA SETS HERE (calculation can require substantial memory and computing power)
 for(n in signal[i,]){
     n <- as.character(n)
     if(n %in% c("hadCRUT4", "pages2k")){next} 
@@ -92,7 +93,7 @@ for(n in signal[i,]){
     #compute scaling coefficients
     for(i in 1:dim(coords)[1]){
         print(i)
-        fit <- SlopeFit(specs[[i]], 1/max(tscale[[scale]]), 1/min(tscale[[scale]]), bDebug=T)
+        fit <- SlopeFit(specs[[i]], 1/max(tscale[[scale]]), 1/min(tscale[[scale]]), bDebug=F)
         if(i %in% seq(0, 100000, 100)){fit <- SlopeFit(specs[[i]], 1/max(tscale[[scale]]), 1/min(tscale[[scale]]), bDebug=T)}
         scaling[[n]][[i]] <- list(slope=fit$slope, slopesd=fit$slopesd)
         rm(fit)
@@ -100,4 +101,7 @@ for(n in signal[i,]){
     coord[[n]] <- coords
 }
 
-scaling_tbb <- scaling_to_list(scaling, coord)
+scaling_tbb <- scaling_to_list(scaling, coord, scale)
+
+#once the above for loop was carried out for all i in "signal", the tibble can be saved as
+#saveRDS(scaling_tbb, "data/scaling_tbb.Rds") !be careful with overwriting the original file
