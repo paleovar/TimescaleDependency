@@ -90,10 +90,19 @@ prxtbb <- prxtbb %>%
   add_column(interp.res = unlist(diffs))
 prxtbb <- prxtbb %>% filter(Name %in% names(hiat[lengths(hiat) == 0L]))
 pages.meta <- pages.meta %>% filter(Name %in% names(hiat[lengths(hiat) == 0L]))
+prxlist <- prxlist[prxtbb$Name]
+prxlist <- tibble(Name=character(), data=list())
+    for(i in seq_along(names(prxlist))){
+      tbb <- rbind(tbb, tibble(
+      Name = names(prxlist)[[i]],
+      data = prxlist[i]
+      )
+      )
+    }
 
 #compute the spectra
 prxtbbspec <- tibble_spec(equidistant(prxtbb), k=3, nw=2)
-rm(check.prxlist, locs, meta, meta.pages, pdata, prxlist, prxlist.pages, hiat, diffs, prxtbb)
+rm(check.prxlist, locs, meta, meta.pages, pdata, prxlist.pages, hiat, diffs, prxtbb)
 gc()
 
 #compute regional mean spectra for pages2k

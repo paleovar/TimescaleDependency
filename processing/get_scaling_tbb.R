@@ -3,6 +3,7 @@ source("helpers/functions.R")
 source("processing/functions_processing.R")
 scaling <- list()
 coord <- list()
+save <- F #!be careful with overwriting the original files
 
 get_proxies <- T
 cut <- F
@@ -17,9 +18,11 @@ if(get_proxies){
     length.min = 30
     #filter proxies and compute spectrum
     source("processing/get_rms_pages2k.R")
-    #saveRDS(pages.prxlist, "data/proxylist.Rds")
-    #saveRDS(pages.meta, "data/pages_meta_scaling.Rds")
-    #saveRDS(prxtbbspec, "data/proxy_spectra.Rds")
+    if(save){#!be careful with overwriting the original files
+      saveRDS(prxlist, "data/proxylist.Rds")
+      saveRDS(pages.meta, "data/pages_meta_scaling.Rds")
+      saveRDS(prxtbbspec %>% select(-data, -EquiTs), "data/proxy_spectra.Rds")
+    }
     rm(min.res, min.range, max.hiat, RMST, w.lats)
     specs <- prxtbbspec %>% select(Name, Lon, Lat, Archive, Proxy, interp.res, Spec)
     coords <- data.frame(long=specs$Lon, lat=specs$Lat)
