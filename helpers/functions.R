@@ -246,7 +246,7 @@ list_to_tibble <- function(list_spec_obj){
 #' @param beta scaling coefficient
 #' @return list() object with the sample timeseries and simulated powerlaw spectrum
 #' @export
-sample_from_proxy <- function(diffs, beta){
+sample_from_proxy <- function(diffs, beta, plt=T){
   #get temporal resolution of proxy records
   #simulate time series with powerlaw scaling, resolution of 1 year and same length as proxy 
   powerlaw <- PaleoSpec::SimPowerlaw(beta, ceiling(sum(diffs)))
@@ -257,10 +257,11 @@ sample_from_proxy <- function(diffs, beta){
   df <- zoo(avg$avg, order.by = avg$breaks)
   df <- df[1:(length(df)-1)]
   powerlaw <- powerlaw[1:length(powerlaw)-1]
-  
-  plot(powerlaw, col="red", type="p")
-  lines(df, col="blue", type="p")
-  
+  if(plt=T){
+    plot(powerlaw, col="red", type="p")
+    lines(df, col="blue", type="p")
+  }
+
   if(any(unique(index(df)) != index(df))){print("non-unique")}
   return(list(sample=df, powerlaw=powerlaw))
 }
