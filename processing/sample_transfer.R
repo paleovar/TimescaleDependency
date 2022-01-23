@@ -1,6 +1,10 @@
+#This script generates the `./data/transfer.Rds` and `./data/sample_spec.Rds` data, 
+#but uses less samples as published to avoid memory overflow. 
+#The number of samples `N_sample` can be adapted below, default 50.
 source("helpers/init.R")
 source("helpers/functions.R")
 source("processing/functions_processing.R")
+save <- F
 
 #be patient with the following lines: sampling of spectra
 samples <- list()
@@ -40,10 +44,10 @@ resp_models_wENSO <- samples$models_wENSO
 resp_models_woENSO <- samples$models_woENSO
 
 #Sampling of the mean spectra and the gain 
-N_sample <- 50 #be carful with changing this parameter. It requires a lot of computing time to go to a larger number of samples
+N_sample <- 3 #be carful with changing this parameter. It requires a lot of computing time to go to a larger number of samples
 sample_raw <- list()
 #GAIN
-for(transfertarget in c("forc", "models_woENSO", "models_wENSO")){ #"recons",
+for(transfertarget in c("forc", "models_woENSO", "models_wENSO", "recons")){ 
     l <- list()
     print(transfertarget)
     for(i in 1:N_sample){
@@ -96,52 +100,52 @@ for(transfertarget in c("forc", "models_woENSO", "models_wENSO")){ #"recons",
     )
 }
 
-N_sample <- 50 #be carful with changing this parameter. It requires a lot of computing time to go to a larger number of samples
+N_sample <- 3 #be carful with changing this parameter. It requires a lot of computing time to go to a larger number of samples
 sample_transfer <- list()
 #SPECTRA
-for(transfertarget in c("recons","forc", "models_woENSO", "models_wENSO")){
+for(transfertarget in c("recons", "models_woENSO", "models_wENSO")){
     l <- list()
     print(transfertarget)
     for(i in 1:N_sample){
-        if(transfertarget=="forc"){next}
-    specList <- list()
-    #forcing
-    comp_forc$sol <- forc_sol[[sample(1:length(forc_sol), 1, replace = TRUE)]]
-    comp_forc$vol <- forc_vol[[sample(1:length(forc_vol), 1, replace = TRUE)]]
-    
-    specList$forc <- MeanSpectrum(comp_forc)$spec
-    
-    specList$forc$spec <- specList$forc$spec * length(names(comp_forc))
-    specList$forc$lim.1 <-  specList$forc$lim.1 * length(names(comp_forc))
-    specList$forc$lim.2 <- specList$forc$lim.2 * length(names(comp_forc))
+        #if(transfertarget=="forc"){next}
+        specList <- list()
+        #forcing
+        comp_forc$sol <- forc_sol[[sample(1:length(forc_sol), 1, replace = TRUE)]]
+        comp_forc$vol <- forc_vol[[sample(1:length(forc_vol), 1, replace = TRUE)]]
+        
+        specList$forc <- MeanSpectrum(comp_forc)$spec
+        
+        specList$forc$spec <- specList$forc$spec * length(names(comp_forc))
+        specList$forc$lim.1 <-  specList$forc$lim.1 * length(names(comp_forc))
+        specList$forc$lim.2 <- specList$forc$lim.2 * length(names(comp_forc))
 
-    #GMST
-    if(transfertarget == "recons"){
-        idx1 <- sample(1:length(resp_recons), 1, replace=TRUE)
-        resp_recons2$pages <- resp_recons[[idx1]][[sample(1:length(resp_recons[[idx1]]), 1, replace=TRUE)]]
-        specList$resp <- MeanSpec(resp_recons2)$spec
+        #GMST
+        if(transfertarget == "recons"){
+            idx1 <- sample(1:length(resp_recons), 1, replace=TRUE)
+            resp_recons2$pages <- resp_recons[[idx1]][[sample(1:length(resp_recons[[idx1]]), 1, replace=TRUE)]]
+            specList$resp <- MeanSpec(resp_recons2)$spec
+            }
+        
+        if(transfertarget == "models_woENSO"){
+            specList$resp <- resp_models_woENSO[[sample(1:length(resp_models_woENSO), 1, replace=TRUE)]]
         }
-    
-    if(transfertarget == "models_woENSO"){
-        specList$resp <- resp_models_woENSO[[sample(1:length(resp_models_woENSO), 1, replace=TRUE)]]
-    }
-    if(transfertarget == "models_wENSO"){
-        specList$resp <- resp_models_wENSO[[sample(1:length(resp_models_wENSO), 1, replace=TRUE)]]
-    }
-    
-    #transfer
-    l[[i]] <- transferSpec(specList, input=1, output=2)$spec
-    l[[i]]$lim.1 <- NULL
-    l[[i]]$lim.2 <- NULL
-    #LPlot(l[[i]])
-    
-    comp_forc$sol <- NULL
-    comp_forc$vol <- NULL
-    idx1 <- NULL
+        if(transfertarget == "models_wENSO"){
+            specList$resp <- resp_models_wENSO[[sample(1:length(resp_models_wENSO), 1, replace=TRUE)]]
+        }
+        
+        #transfer
+        l[[i]] <- transferSpec(specList, input=1, output=2)$spec
+        l[[i]]$lim.1 <- NULL
+        l[[i]]$lim.2 <- NULL
+        #LPlot(l[[i]])
+        
+        comp_forc$sol <- NULL
+        comp_forc$vol <- NULL
+        idx1 <- NULL
     }
 
     l <- lapply(l, function(x) cut(x, 500, 2, index=FALSE))
-    names(l) <- as.character(seq(1:length(t)))
+    names(l) <- as.character(seq(1:length(l)))
 
     sample_transfer[[transfertarget]] <- list_to_tibble(l) %>% unnest(data) %>% group_by(freq)  %>% summarize(
     m = mean(spec, na.rm=TRUE),  
@@ -151,11 +155,11 @@ for(transfertarget in c("recons","forc", "models_woENSO", "models_wENSO")){
 }
 
 sample_raw <- bind_rows(lapply(names(sample_raw), function(x) sample_raw[[x]] %>% add_column(name=x)))
-sample_transfer <- bind_rows(lapply(names(sample_transfer), function(x) sample_transfer[[x]] %>% add_column(name=x)))
+sample_transfer_test <- bind_rows(lapply(names(sample_transfer), function(x){
+    sample_transfer[[x]] %>% add_column(name=x) %>% add_column(var=GetVar(sample_transfer[[x]] %>% rename(spec=m), c(1/370, 1/2.1)))}
+    ))
 
 if(save){
     saveRDS(sample_raw, paste0("data/transfer_", N_sample, ".Rds"))
     saveRDS(sample_transfer, paste0("data/sample_spec_", N_sample, ".Rds"))
 }
-
-
