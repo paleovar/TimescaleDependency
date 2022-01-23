@@ -44,7 +44,7 @@ resp_models_wENSO <- samples$models_wENSO
 resp_models_woENSO <- samples$models_woENSO
 
 #Sampling of the mean spectra and the gain 
-N_sample <- 3 #be carful with changing this parameter. It requires a lot of computing time to go to a larger number of samples
+N_sample <- 50 #be carful with changing this parameter. It requires a lot of computing time to go to a larger number of samples
 sample_raw <- list()
 #GAIN
 for(transfertarget in c("forc", "models_woENSO", "models_wENSO", "recons")){ 
@@ -100,7 +100,7 @@ for(transfertarget in c("forc", "models_woENSO", "models_wENSO", "recons")){
     )
 }
 
-N_sample <- 3 #be carful with changing this parameter. It requires a lot of computing time to go to a larger number of samples
+N_sample <- 50 #be carful with changing this parameter. It requires a lot of computing time to go to a larger number of samples
 sample_transfer <- list()
 #SPECTRA
 for(transfertarget in c("recons", "models_woENSO", "models_wENSO")){
@@ -155,7 +155,7 @@ for(transfertarget in c("recons", "models_woENSO", "models_wENSO")){
 }
 
 sample_raw <- bind_rows(lapply(names(sample_raw), function(x) sample_raw[[x]] %>% add_column(name=x)))
-sample_transfer_test <- bind_rows(lapply(names(sample_transfer), function(x){
+sample_transfer <- bind_rows(lapply(names(sample_transfer), function(x){
     sample_transfer[[x]] %>% add_column(name=x) %>% add_column(var=GetVar(sample_transfer[[x]] %>% rename(spec=m), c(1/370, 1/2.1)))}
     ))
 
