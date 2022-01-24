@@ -56,6 +56,12 @@ Creating some of the figures additionally requires (separately loaded in the cor
 
 Generating some of the pre-processed data in `./processing` (using data from Zenodo) might further require:
 - `ncdf4`
+- `foreach`
+- `poweRlaw`
+- `VGAM`
+- `R.matlab`
+- `doParallel`
+- `furrr`
 
 ## Data references
 
