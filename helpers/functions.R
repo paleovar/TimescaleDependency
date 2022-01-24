@@ -257,7 +257,7 @@ sample_from_proxy <- function(diffs, beta, plt=T){
   df <- zoo(avg$avg, order.by = avg$breaks)
   df <- df[1:(length(df)-1)]
   powerlaw <- powerlaw[1:length(powerlaw)-1]
-  if(plt=T){
+  if(plt==T){
     plot(powerlaw, col="red", type="p")
     lines(df, col="blue", type="p")
   }
