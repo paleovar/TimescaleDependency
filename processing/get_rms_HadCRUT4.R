@@ -66,5 +66,4 @@ if(save){
 lats <- unlist(lapply(result$coords_list, function(x) x[2]))
 w.lats <- cos(lats*pi/180)/sum(cos(lats*pi/180))
 specs <- lapply(result$temp_list, function(x) SpecMTM(x, k=3, nw=2, detrend=T))
-RMST <- list()
 RMST$HadCRUT4 <- MeanSpec(specs, weights=w.lats)
