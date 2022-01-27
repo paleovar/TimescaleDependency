@@ -62,6 +62,8 @@ Generating some of the pre-processed data in `./processing` (using data from Zen
 - `R.matlab`
 - `doParallel`
 - `furrr`
+- `Palinsol`
+- `rlist`
 
 ## Data references
 
