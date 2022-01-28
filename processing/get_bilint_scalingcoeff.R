@@ -6,6 +6,7 @@ warm_cutoff = F
 scale = "cen"
 scaling <- list()
 
+#be careful running this code, it might require up to 30 GB free memory
 for(n in c(signal_tbb %>% filter(type=="model"))$signal){
   summary <- readRDS(paste0("processing/raw_data/", n, ".Rds"))
 
@@ -49,4 +50,6 @@ tbb <- tibble()
 for(n in names(scaling)){
   tbb <- rbind(tbb, list_to_tibble(scaling[[n]]) %>% unnest(data) %>% add_column(signal=n))
 }
-saveRDS(tbb, "processing/bilint_scalingcoeff.Rds")
+if(save){
+  saveRDS(tbb, "processing/bilint_scalingcoeff.Rds")
+}
