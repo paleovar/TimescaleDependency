@@ -5,9 +5,10 @@ library(cowplot)
 library(forcats)
 model <- c(signal_tbb %>% filter(type=="model") %>% select(signal))$signal
 obs <- c(signal_tbb %>% filter(type=="obs") %>% select(signal))$signal
-signal <- c(model, obs)
+signal <- signal_tbb$signal
 #load GMST data
-GMST <- readRDS("data/GMST_tbb.Rds") %>% filter(!signal %in% c("MPI-M_highres", "CESM_LM_highres", "ERA5_highres"))
+GMST <- readRDS("data/GMST_tbb.Rds") %>% filter(!signal %in% c("MPI-M_highres", "CESM_LM_highres", "ERA5_highres", "CESM_LM_cont", "MPI-M_cont"))
+GMST <- GMST %>% ungroup() %>% mutate(signal= case_when(signal=="hadCRUT" ~ "hadCRUT4", TRUE ~ signal))
 
 #Compute running mean
 GMST <- GMST %>% unnest(data) %>% 
@@ -26,16 +27,16 @@ GMST$median <- coalesce(GMST$rollm, GMST$median)
 GMST$rollm <- NULL
 
 #Compute anomalies w.r.t. reference period for HadCM3
-temptbb_HadCM3 <- GMST %>% filter(!signal %in% c("ERA5", "pages2k", "haCRUT")) %>%  filter(year >= 1800 & year <= 1850) %>% group_by(signal) %>% nest() %>%
+temptbb_HadCM3 <- GMST %>% filter(!signal %in% c("ERA5", "pages2k", "hadCRUT4")) %>%  filter(year >= 1800 & year <= 1850) %>% group_by(signal) %>% nest() %>%
   mutate(mean1850=purrr::map(.x = data, .f = ~mean(.x$median, na.rm = T))) %>% select(-data) %>% mutate(mean1850=unlist(mean1850))
-modelmean1850 = temptbb_HadCM3 %>% filter(!signal %in% c("HadCM3", "ERA5", "pages2k", "haCRUT")) %>% 
+modelmean1850 = temptbb_HadCM3 %>% filter(!signal %in% c("HadCM3", "ERA5", "pages2k", "hadCRUT4")) %>% 
   ungroup() %>% select(mean1850) %>% summarise(mean(mean1850)) %>% as.numeric()
 temptbb_HadCM3 <- temptbb_HadCM3 %>% filter(signal=="HadCM3")
 
 #Compute anomalies w.r.t. reference period for all other datasets
 temptbb <- GMST %>% filter(signal!="HadCM3", year >= 1961 & year <= 1990) %>% group_by(signal) %>% nest() %>%
   mutate(mean6190=purrr::map(.x = data, .f = ~mean(.x$median, na.rm = T))) %>% select(-data) %>% mutate(mean6190=unlist(mean6190))
-modelmean6190 = temptbb %>% filter(!signal %in% c("HadCM3", "ERA5", "pages2k", "haCRUT")) %>% 
+modelmean6190 = temptbb %>% filter(!signal %in% c("HadCM3", "ERA5", "pages2k", "hadCRUT4")) %>% 
   ungroup() %>% select(mean6190) %>% summarise(mean(mean6190)) %>% as.numeric()
 corr <- modelmean6190 - modelmean1850
 temptbb_HadCM3$mean6190 <- temptbb_HadCM3$mean1850 + corr
