@@ -7,6 +7,9 @@ library(forcats)
 gmspectra <- readRDS("data/global_mean_spectra.Rds")
 lmspectra <- readRDS("data/local_mean_spectra.Rds")
 
+model <- c(signal_tbb %>% filter(type=="model"))$signal
+obs <- c(signal_tbb %>% filter(type=="obs"))$signal
+
 #get mean spectrum and filter spectra for global mean surface temperature
 mean_df <- gmspectra %>% filter(signal == "mean") %>% unnest(data)
 gmspectra <- gmspectra %>% filter(!signal %in% c("MPI-M_cont", "CESM_LM_cont"))  %>%
