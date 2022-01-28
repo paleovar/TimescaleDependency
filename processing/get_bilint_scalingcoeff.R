@@ -51,5 +51,5 @@ for(n in names(scaling)){
   tbb <- rbind(tbb, list_to_tibble(scaling[[n]]) %>% unnest(data) %>% add_column(signal=n))
 }
 if(save){
-  saveRDS(tbb, "processing/bilint_scalingcoeff.Rds")
+  saveRDS(tbb %>% rename(Name=model), "processing/bilint_scalingcoeff.Rds")
 }

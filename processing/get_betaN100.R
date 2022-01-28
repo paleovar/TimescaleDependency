@@ -21,7 +21,7 @@ tbb <- inner_join(df, specs)
 tbb <- inner_join(tbb, scaling)
 
 #Sampling the uncertainties of the scaling coefficients
-N=10#0
+N=100
 results <- replicate(N, 
                  {
     #create artificial proxy with (sample) and without (powerlaw) block averaging
@@ -52,7 +52,7 @@ results <- replicate(N,
                                                map2(comparison.spec, temp, function(.comparison.spec, .none) 
                                                  SlopeFit(.comparison.spec, 1/max(tscales), 1/min(tscales))$slope)) %>% 
                                   select(-temp, -tmp)
-    tibble(slopes=unlist(tbb$simslope), compslopes=unlist(tbb$compslope), slopesd = unlist(tbb$slopesd)) %>% mutate(diffs=abs(compslopes-slopes))
+    tibble(slope=unlist(tbb$simslope), compslopes=unlist(tbb$compslope), slopesd = unlist(tbb$slopesd)) %>% mutate(diffs=abs(compslopes-slope))
     })
   
 tmp <- tibble(
@@ -65,17 +65,19 @@ tmp <- tibble(
 names(tmp) <- c(names(results[,1]), "Name")   
 results <- tmp
 
-pages_meta_scaling <- readRDS("data/pages_meta_scaling.Rds")
+pages_meta_scaling <- readRDS("data/pages_meta_scaling.Rds")  %>% select(-Elev_masl, -Proxy) %>% rename(long=Lon, lat=Lat)
 
 bilint_scalingcoeff <- readRDS("processing/bilint_scalingcoeff.Rds")
 
-left_join( .... 
-
-%>% rename(signal=model) %>% add_column(Archive="model"),
-    results %>% add_column(signal="pages2k") %>% select(signal, Name, slopesd, diffs) %>% 
+results <- results %>% left_join(., pages_meta_scaling) %>% add_column(signal="pages2k") %>% select(-compslopes) %>% 
     mutate(slopesd_new = ifelse(signal=="pages2k", sqrt(slopesd**2+diffs**2), slopesd)) %>% 
-    select(-diffs) %>% add_column(scale="cen") %>%
-    inner_join(pages_meta_scaling %>% rename(lat=Lat, lon=Lon) %>% select(-Elev_masl), by=c("Name"))) %>%
-    mutate(Archive = case_when(signal != "pages2k" ~ "model", 
-                               True ~ Archive)
+    select(-diffs) 
 
+bilint_scalingcoeff <- readRDS("processing/bilint_scalingcoeff.Rds") %>% add_column(Archive="model") %>% 
+ left_join(., pages_meta_scaling %>% select(-Archive)) %>% mutate(slopesd_new = slopesd) 
+
+beta_N <- rbind(bilint_scalingcoeff , results) %>% add_column(cutoff=cut_time, scale=scale)
+
+if(save)[
+  saveRDS(beta_N, paste0("data/beta_", N,".Rds"))
+]
