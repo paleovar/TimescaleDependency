@@ -112,4 +112,4 @@ The study *Ellerhoff and Rehfed (2021)* has been funded by the [Heidelberg Gradu
 
 Please report bugs to beatrice.ellerhoff(at)iup.uni-heidelberg.de.
 
-*The authors, December 2021*
+*The authors, January 2022*
