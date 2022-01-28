@@ -32,7 +32,10 @@ for(n in c(signal_tbb %>% filter(type=="model"))$signal){
    sim_data <- zoo(t(apply(summary$temp, 3, function(data_tmp){
       fields::interp.surface(list(x=summary$lon, y=summary$lat, z=data_tmp), data.frame(x=pages.meta$Lon, y=pages.meta$Lat))
       })), order.by=summary$time)
-    
+
+  rm(summary)
+  gc()  
+  
   res <- signal_tbb[which(signal_tbb$signal==n), ][["interp.res"]]
   time <- index(sim_data[,1])
 
@@ -40,12 +43,10 @@ for(n in c(signal_tbb %>% filter(type=="model"))$signal){
   fit <- lapply(tmp, function(x) SlopeFit(x, 1/max(tscale[[scale]]), 1/min(tscale[[scale]]), bDebug=T))
   scaling[[n]] <- lapply(fit, function(x) list(slope=x$slope, slopesd=x$slopesd))
   names(scaling[[n]]) <- pages.meta$Name  
-  rm(summary)
-  gc()
 }
 
 tbb <- tibble()
 for(n in names(scaling)){
   tbb <- rbind(tbb, list_to_tibble(scaling[[n]]) %>% unnest(data) %>% add_column(signal=n))
 }
-tbb
+saveRDS(tbb, "processing/bilint_scalingcoeff.Rds")

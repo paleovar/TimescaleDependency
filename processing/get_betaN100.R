@@ -67,6 +67,8 @@ results <- tmp
 
 pages_meta_scaling <- readRDS("data/pages_meta_scaling.Rds")
 
+bilint_scalingcoeff <- readRDS("processing/bilint_scalingcoeff.Rds")
+
 left_join( .... 
 
 %>% rename(signal=model) %>% add_column(Archive="model"),
