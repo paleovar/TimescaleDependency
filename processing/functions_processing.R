@@ -15,14 +15,12 @@ get_max.hiat <- function(tscales=c(200,10)){min(tscales)*5}
 
 tscale <- list()
 tscale$cen <- c(200, 10)
+
 #--------------------------------------------------------------#
-#' @title
-#' @description 
-#' @param target spectrum that needs to be cutted 
-#' @param from starting point
-#' @param to end point
-#' @param index FALSE / TRUE indicates whether "from" and "to" refer to an index or a period (in years)
-#' @return object of class "spec"
+#' @title Criteria for proxy selections
+#' @description defines selection criteria based on resolution, hiatus, range and length
+#' @param x character() either "strong" or "loose" 
+#' @return list(min.res, max.hiat, min.range, length.min)
 #' @export
 get_restrictions <- function(x){
   if(x == "strong"){
@@ -91,13 +89,14 @@ SpecInterpolateSpline <- function (freqRef, spec) {
   return(result)
 }
 
-
 #--------------------------------------------------------------#
-#' @title 
-#' @description  
-#' @param freqRef
-#' @param spec
-#' @return
+#' @title Spectral Gain 
+#' @description Computes the spectral gain by dividing the output by the input spectrum, based on functions from the PaleoSpec package
+#' @param specList list that contains at least two objects of class "spec"
+#' @param input index of the input spectrum 
+#' @param output index of the output spectrum
+#' @param iRemoveLowest number of lowest frequencies to remove (e.g. to remove detrending bias)
+#' @return object of class "spec"
 #' @export
 transferSpec <- function (specList, input=input.spec, output=output.spec, iRemoveLowest = 1){
   remove.lowestFreq <- function (spec, iRemove){ 
@@ -172,13 +171,14 @@ transferSpec <- function (specList, input=input.spec, output=output.spec, iRemov
 }
 
 #--------------------------------------------------------------#
-#' @title 
-#' @description  
-#' @param freqRef
-#' @param spec
-#' @return
+#' @title Variance from spectrum
+#' @description  Compute variance from spectrum based on functions from the PaleoSpec package
+#' @param spec object of class spec
+#' @param f vector with two elements c(,) defining the start and end frequency for integration
+#' @param dfreq NULL or numeric() defining the spacing between frequencies 
+#' @return numeric() variance
 #' @export
-GetVar <- function (spec, f, dfreq = NULL, df.log = 0, bw = 3) 
+GetVar <- function (spec, f, dfreq = NULL) 
 {
   if (f[1] >= f[2]) 
     stop("f1 must be < f2")
@@ -208,11 +208,12 @@ GetVar <- function (spec, f, dfreq = NULL, df.log = 0, bw = 3)
 }
 
 #--------------------------------------------------------------#
-#' @title 
-#' @description  
-#' @param freqRef
-#' @param spec
-#' @return
+#' @title Bind tibbles with scaling coefficients to a single tibble
+#' @description Converts various tibbles containing scaling coefficients into a single tibble  
+#' @param target input tibble()
+#' @param coord coords to be asign to tibble 
+#' @param scale character(), here "cen"
+#' @return tibble()
 #' @export
 #If the scaling list is complete, it can be transformed to a tibble (similar to ./data/scaling_tbb.Rds) as follows: 
 scaling_to_list <- function(target, coord, scale){

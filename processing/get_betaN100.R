@@ -1,4 +1,4 @@
-source("helpers/init.R")
+source("processing/init_processing.R")
 source("helpers/functions.R")
 source("processing/functions_processing.R")
 library(purrr)
