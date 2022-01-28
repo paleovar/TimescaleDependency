@@ -135,10 +135,12 @@ ggplot() + theme_td() +
   theme(legend.position=c(0.41, 0.34)) +
   scale_color_manual(values = colors, breaks=c("raw signal", "block averaged surrogate", "smoothed spectrum"), labels=c("raw spectrum", "surrogate spectrum", "smooothed surrogate spectrum"))  +
   scale_linetype_manual(values=linetype) +
-  annotate(geom="text", x=50, y=0.003, label=expression(paste("Proxy: NAm-LakeMina, ", beta, "=1.31,", Delta, "t=3.98")), size=notationsize) +
-  annotate(geom="text", x=28, y=100, label= temp,  size=notationsize, parse=TRUE) +
+  #adapt annotation given the `temp` output
+  #annotate(geom="text", x=50, y=0.003, label=expression(paste("Proxy: NAm-LakeMina, ", beta, "=1.31,", Delta, "t=3.98")), size=notationsize) +
+  #annotate(geom="text", x=28, y=100, label= temp,  size=notationsize, parse=TRUE) +
   guides(colour = guide_legend(override.aes = list(linetype = c("dashed", "solid", "dotted")))) +
   guides(fill=FALSE, linetype=FALSE)
+
 
 #--------------------------------------------------------------#
 #FS9
@@ -148,7 +150,7 @@ tmp_spec <- readRDS("data/supp/pages_spectra_selection.Rds") %>% rename(signal=m
 #create plot
 tmp_spec %>% plot_spec(ylims=c(0.05, 30), xlims=c(1.e3, 2), name.col="cutoff", name.fill="res", name.line="res", name.alpha="cutoff") +
     scale_fill_manual(values=c("#F5793A", "#0F2080")) +
-    scale_linetype_manual(values=c("dashed", "solid"), name="coverage:", labels=c("PI", "hist")) +
+    scale_linetype_manual(values=c("dashed", "solid"), name="cutoff:", labels=c("PI", "hist")) +
     scale_color_manual(values=c( "#F5793A",  "#0F2080"), name="selection:") +   
     scale_alpha_manual(values=rep(0.1, 4)) +
     guides(alpha=F, linetype = guide_legend(order = 2), color = guide_legend(order = 1)) +
