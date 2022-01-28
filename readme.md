@@ -64,6 +64,7 @@ Generating some of the pre-processed data in `./processing` (using data from Zen
 - `furrr`
 - `Palinsol`
 - `rlist`
+- `fields`
 
 ## Data references
 
