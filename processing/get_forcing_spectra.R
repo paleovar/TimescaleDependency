@@ -33,7 +33,7 @@ means$sol <- AddConfInterval(SpecInterpolateSpline(nth_element(means$sol$freq, 1
 #LPlot(means$sol)
 #--------------mean co2 forcing-----------#
 idx <- which(names(spec_sel_list[co2_idx]) == "co2")
-selection <- lapply(spec_sel_list[co2_idx][idx], function(x) cut(x, 500, 27)) #18
+selection <- lapply(spec_sel_list[co2_idx][idx], function(x) cut(x, 500, 27)) 
 means$co2 <- append(selection, lapply(spec_sel_list[co2_idx][-idx], function(x) cut(x, 100, 0.0013)))
 means$co2 <- MeanSpec(means$co2)$spec
 freqref <- c(selection$co2$freq, nth_element(means$co2$freq[which.min(abs(means$co2$freq-max(selection$co2$freq))):length(means$co2$freq)], 1, 10))

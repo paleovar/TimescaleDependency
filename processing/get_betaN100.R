@@ -9,6 +9,7 @@ tscales <- c(200, 10)
 min.res = get_min.res(tscales)
 min.range = get_min.range(tscales)
 max.hiat = get_max.hiat(tscales)
+cut_time = 2020
 
 #load data
 prxlist <- readRDS("data/proxylist.Rds")
@@ -20,7 +21,7 @@ tbb <- inner_join(df, specs)
 tbb <- inner_join(tbb, scaling)
 
 #Sampling the uncertainties of the scaling coefficients
-N=100
+N=10#0
 results <- replicate(N, 
                  {
     #create artificial proxy with (sample) and without (powerlaw) block averaging
@@ -54,13 +55,25 @@ results <- replicate(N,
     tibble(slopes=unlist(tbb$simslope), compslopes=unlist(tbb$compslope), slopesd = unlist(tbb$slopesd)) %>% mutate(diffs=abs(compslopes-slopes))
     })
   
-  tmp <- tibble(
+tmp <- tibble(
     Reduce("+", results[1,])/N, 
     Reduce("+", results[2,])/N,
     Reduce("+", results[3,])/N,
     Reduce("+", results[4,])/N,
     Name = tbb$Name
   ) 
-  names(tmp) <- c(names(results[,1]), "Name")   
-  results <- tmp
-  }
+names(tmp) <- c(names(results[,1]), "Name")   
+results <- tmp
+
+pages_meta_scaling <- readRDS("data/pages_meta_scaling.Rds")
+
+left_join( .... 
+
+%>% rename(signal=model) %>% add_column(Archive="model"),
+    results %>% add_column(signal="pages2k") %>% select(signal, Name, slopesd, diffs) %>% 
+    mutate(slopesd_new = ifelse(signal=="pages2k", sqrt(slopesd**2+diffs**2), slopesd)) %>% 
+    select(-diffs) %>% add_column(scale="cen") %>%
+    inner_join(pages_meta_scaling %>% rename(lat=Lat, lon=Lon) %>% select(-Elev_masl), by=c("Name"))) %>%
+    mutate(Archive = case_when(signal != "pages2k" ~ "model", 
+                               True ~ Archive)
+

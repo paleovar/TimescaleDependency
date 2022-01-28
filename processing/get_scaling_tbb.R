@@ -48,26 +48,6 @@ if(get_proxies){
     coord[[n]] <- coords
 }
 
-#If the scaling list is complete, it can be transformed to a tibble (similar to ./data/scaling_tbb.Rds) as follows: 
-scaling_to_list <- function(target, coord, scale){
-  tbb <- tibble(model=character(),
-                scale=character(),
-                slope=numeric(),
-                slopesd=numeric(),
-                lon=numeric(),
-                lat=numeric())
-  for(i in names(target)){
-    tbb <- bind_rows(tibble(model=i,
-                            scale=scale,
-                            slope=as.numeric(lapply(target[[i]], function(x) x$slope)),
-                            slopesd=as.numeric(lapply(target[[i]], function(x) x$slopesd)),
-                            lon=as.numeric(paste(coord[[i]]$lon)),
-                            lat=as.numeric(paste(coord[[i]]$lat))),
-                     tbb)
-  }
-  return(tbb)
-}
-
 #model parameters
 meta.res_tbb <- readRDS("helpers/meta_res.Rds")
 signal <- signal_tbb %>% filter(type=="model") %>% select(signal)
