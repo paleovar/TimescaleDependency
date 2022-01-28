@@ -34,24 +34,20 @@ pages.meta <- readRDS("data/pages_meta_scaling.Rds")
 #prepare data for plotting
 tbb1 <- res %>% unnest(data) %>% group_by(Name, beta) %>% 
   dplyr::summarise(slope_lr_sd=sd(slope_lr),
-                   slope_glr_sd=sd(slope_glr),
                    slope_mle_Rlaw_sd=sd(slope_mle_Rlaw)) %>%
-  pivot_longer(., cols=c(slope_lr_sd, slope_glr_sd, slope_mle_Rlaw_sd), names_to="method", values_to="beta_est_sd") %>%
+  pivot_longer(., cols=c(slope_lr_sd, slope_mle_Rlaw_sd), names_to="method", values_to="beta_est_sd") %>%
   mutate(method=case_when(method=="slope_mle_Rlaw"| method=="slope_mle_Rlaw_sd" ~ "MLE (Rlaw)",
                           method=="slope_lr"| method=="slope_lr_sd" ~ "LR",
-                          method=="slope_glr"| method=="slope_glr_sd" ~ "GLR",
-                            TRUE ~ method))
+                          TRUE ~ method))
 tbb2 <- res %>% unnest(data) %>% group_by(Name, beta) %>% 
   dplyr::summarise(slope_lr=mean(slope_lr), 
-                   slope_glr=mean(slope_glr),
                    slope_mle_Rlaw=mean(slope_mle_Rlaw),
                    slopesd=mean(slopesd)) %>%
-  pivot_longer(., cols=c(slope_lr, slope_glr, slope_mle_Rlaw), names_to="method", values_to="beta_est") %>% 
+  pivot_longer(., cols=c(slope_lr, slope_mle_Rlaw), names_to="method", values_to="beta_est") %>% 
   mutate(slopesd = ifelse(method != "slope_lr", NA, slopesd)) %>% 
   mutate(method=case_when(method=="slope_mle_Rlaw"| method=="slope_mle_Rlaw_sd" ~ "MLE (Rlaw)",
                           method=="slope_lr"| method=="slope_lr_sd" ~ "LR",
-                          method=="slope_glr"| method=="slope_glr_sd" ~ "GLR",
-                            TRUE ~ method))
+                          TRUE ~ method))
 tbb <- inner_join(tbb1, tbb2)
 
 #create plot
