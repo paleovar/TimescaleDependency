@@ -25,6 +25,7 @@ directories | description
 ---- | ----------
 `./data/` | Contains the pre-processed data that serves as input for all figures. The sub-directory `./data/supp` contains data used for supplementary figures only. `./data/shapes/50m_physical` provides mapping information such as coastlines etc. from [naturalearthdata](https://www.naturalearthdata.com/downloads/110m-physical-vectors/), see `ne_50m_land.README.html`. 
 `./helpers/`| Contains scripts (`.R`-files) that define useful functions, initial parameters and load required packages, and meta data (`.Rds` files).
+`./processing/`| Contains scripts (`.R`-files) to generate the data in `./data/`. The input data (i.e. cleaned-up and preprocessed raw data) is contained in the accompanied [Zenodo](https://www.zenodo.org/) zip file. To reproduce all figures, this folder is not needed. However, to understand and reproduce the analysis, the scripts might be helpful. 
 
 additional files | description
 ---- | ----------
