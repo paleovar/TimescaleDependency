@@ -10,7 +10,7 @@ This repository provides code to reproduce the figures of **"Probing the timesca
 
 **Contact:** beatrice.ellerhoff(at)iup.uni-heidelberg.de
 
-Please see `./license.md` for terms of use. This repository contains the **maintained code and pre-processed data** to create the figures of *Ellerhoff and Rehfeld (2021)*. The raw data will be soon archived on [Zenodo](https://www.zenodo.org/), together with the code to generate the pre-processed data. It is therefore important to note, that the subfolder (`./processing`) is not complete yet. However, all figure can be reproduced using the post-processed data (`./data`).
+Please see `./license.md` for terms of use. This repository contains the **maintained code and pre-processed data** to create the figures of *Ellerhoff and Rehfeld (2021)*. The raw data will be soon available on [Zenodo](https://www.zenodo.org/), together with the code to generate the pre-processed data. It is therefore important to note, that the subfolder (`./processing`) is not complete yet. In case you'd like to reproduce the data in `./data` please follow the instructions in `./preprocessing/readme_preprocessing.md` and download the input data from [Zenodo](https://www.zenodo.org/). All figure can be reproduced using the post-processed data (`./data`) and the code in the github repository. 
 
 ## Organisation of this repository
 
@@ -86,6 +86,7 @@ Paleoclimate, observational and reanalysis data:
 
 - **H. Hersbach et al.**, *The ERA5 global reanalysis*, Quarterly Journal of the Royal Meteorological Society (2020)
 - **C. P. Morice et al.**, *Quantifying uncertainties in global and regional temperature change using an ensemble of observational estimates: The HadCRUT4 data set*, Journal of Geophysical Research Atmospheres (2012)
+- **PAGES 2k Consortium**, *A global multiproxy database for temperature reconstructions of the Common Era*, Scientific Data (2017)
 - **PAGES 2k Consortium**, *Consistent multidecadal variability in global temperature reconstruc50 tions and simulations over the Common Era*, Nature Geoscience (2019)
 
 Forcing reconstructions:
