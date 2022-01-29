@@ -13,3 +13,15 @@ We kindly ask the user of this repository to download the following datasets int
 **Important note on how to generate the data:**
 We have equipped the data generating code with a few "safety mechanisms". You will find a `save <- F` at the top of data generating scripts. Please carefully change this to `save <- T` and mind that this will potentially overwrite excisting files. 
 Many data generating scripts include "for-loops" over the datasets or iterations (i.e. bootstrapping). Please carefully choose your parameters and try first with single datasets. Some of the codes might require large memory and long computing times. There are warnings in the according scripts. 
+
+**References:**
+The data files `./raw_data` were obtained by extracting the temperature fields from the following publications. In particular, we alligned the time axis, computed temperature anomalies, cleaned the data (i.e. performed linear interpolation of NAs if necessary) and shaped the data into a consistent format to facilitate the analysis.
+
+- **Y. Zhong et al.**, *Asymmetric Cooling of the Atlantic and Pacific Arctic During the Past Two Millennia: A Dual Observation-Modeling Study*, Geophysical Research Letters (2018)
+- **B. L. Otto-Bliesner et al.**, *Climate variability and change since 850 ce an ensemble approach with the community earth system model*, Bulletin of the American Meteorological Society (2016)
+-  **J. H. Jungclaus et al.**, *Climate and carbon-cycle variability over the last millennium*, Climate of the Past (2010)
+- **J. C. Bühler et al.**, *Comparison of the oxygen isotope signatures in speleothem records and iHadCM3 model simulations for the last millennium*, Climate of the Past (2021)
+- **P. Braconnot et al.**, *Strengths and challenges for transient Mid76 to Late Holocene simulations with dynamical vegetation*, Climate of the Past (2019)
+- **Z. Liu**, *Transient simulation of last deglaciation with a new mechanism for Bølling–Allerød warming*, Science (2009)
+- **N. Fischer and J. H. Jungclaus**, *Evolution of the seasonal temperature cycle in a transient Holocene simulation: Orbital forcing and sea-ice*, Climate of the Past (2011)
+- **H. Hersbach et al.**, *The ERA5 global reanalysis*, Quarterly Journal of the Royal Meteorological Society (2020)
