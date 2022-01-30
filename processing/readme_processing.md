@@ -9,9 +9,8 @@ We kindly ask the user of this repository to download the following datasets int
     - Please download the reconstruction files ("BHM.txt", "CPS.txt", "DA.txt", "M08.txt", "OIE.txt", "PAI.txt", "PCR.txt") from the "Reconstructions ensemble" folder at https://figshare.com/collections/Global_mean_temperature_reconstructions_over_the_Common_Era/4507043 into the `./processing/raw_data/pages2k/` directory.
     The corresponding references are: **PAGES 2k Consortium**, *Consistent multidecadal variability in global temperature reconstruc50 tions and simulations over the Common Era*, Nature Geoscience (2019) and **PAGES 2k Consortium**, * A global multiproxy database for temperature reconstructions of the Common Era*, Scientific Data (2017)
     
-    
 **Important note on how to generate the data:**
-We have equipped the data generating code with a few "safety mechanisms". You will find a `save <- F` at the top of data generating scripts. Please carefully change this to `save <- T` and mind that this will potentially overwrite excisting files. 
+To generate a datase`*.Rds`, run the script `get_*.Rds`. Please be aware that we have equipped the data generating code with a few "safety mechanisms". You will find a `save <- F` at the top of data generating scripts. Please carefully change this to `save <- T` and mind that this will potentially overwrite excisting files. 
 Many data generating scripts include "for-loops" over the datasets or iterations (i.e. bootstrapping). Please carefully choose your parameters and try first with single datasets. Some of the codes might require large memory and long computing times. There are warnings in the according scripts. 
 
 **References:**
