@@ -3,7 +3,7 @@ source("helpers/functions.R")
 #load data for F5 and FS5
 forc_speclist_smoothed_tbb <- readRDS("data/forcing_spectra.Rds")
 #fix low frequency bias in estimation of uncertainties for first two points of the mean spectro of solar forcing
-tmp <- forc_speclist_smoothed_tbb %>% filter(forcing=="meansol") %>% select(data)
+tmp <- forc_speclist_smoothed_tbb %>% filter(Name=="meansol") %>% select(data)
 idx <- which(forc_speclist_smoothed_tbb$Name == "meansol")
 tmp$data[[1]]$lim.1[[which(tmp$data[[1]]$lim.1==max(tmp$data[[1]]$lim.1))]] <- tmp$data[[1]]$lim.1[[which(tmp$data[[1]]$lim.1==max(tmp$data[[1]]$lim.1)) +1]]
 tmp$data[[1]]$lim.2[[which(tmp$data[[1]]$lim.2==max(tmp$data[[1]]$lim.2))]] <- tmp$data[[1]]$lim.2[[which(tmp$data[[1]]$lim.2==max(tmp$data[[1]]$lim.2)) +1]]
