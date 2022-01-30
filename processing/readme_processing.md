@@ -1,4 +1,4 @@
-The raw data will be soon available on [Zenodo](https://www.zenodo.org/), together with the code to generate the pre-processed data. 
+The raw data is available on [Zenodo](https://www.zenodo.org/), together with the code to reproduce the analysis and all figures.
 
 **Important note on downloading external datasets prior to data generation:**
 We kindly ask the user of this repository to download the following datasets into the corresponding directories:
