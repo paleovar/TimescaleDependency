@@ -2,7 +2,6 @@ if(!exists("samples")){
   samples <- list()
 }
 
-
 # LARGELY TAKEN FROM: Neukom, Raphael; Barboza, Luis A.; Erb, Michael P.; Shi, Feng; Emile-geay, Julien; Evans, Michael N.; et al. (2019): 
 # Global mean temperature reconstructions over the Common Era. figshare. Collection. https://doi.org/10.6084/m9.figshare.c.4507043.v2 
 #-------------------------------#
@@ -23,6 +22,7 @@ tsapply<-function(x,dim,fun){
 }
 
 #folder with reconstruction outputs
+#Please download the reconstruction files ("BHM.txt", "CPS.txt", "DA.txt", "M08.txt", "OIE.txt", "PAI.txt", "PCR.txt") from the "Reconstructions ensemble" folder at https://figshare.com/collections/Global_mean_temperature_reconstructions_over_the_Common_Era/4507043 into the `./processing/raw_data/pages2k/` directory.
 recons.folder <- "processing/raw_data/pages2k/"
 
 experiment.names <-c("CPS","PCR","M08","PAI","OIE","BHM","DA")

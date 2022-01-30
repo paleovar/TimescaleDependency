@@ -2,6 +2,7 @@ if(!exists("RMST")){
   RMST <- list()
 }
 
+#Please download the "PAGES2k_v2.0.0.Rds" from https://springernature.figshare.com/collections/A_global_multiproxy_database_for_temperature_reconstructions_of_the_Common_Era/3285353 into the same directory (`./processing/raw_data`). Our code calls this dataset as `./processing/raw_data/PAGES2k_v2.0.0.Rds`.
 pdata <- readRDS("processing/raw_data/PAGES2k_v2.0.0.Rds")
 
 cut_warming_pages <- function(tibble, cut_time, cut, length.min=length.min){
