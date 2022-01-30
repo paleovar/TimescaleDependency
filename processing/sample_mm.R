@@ -5,8 +5,7 @@ if(!exists("samples")){
 #wENSO specifies the selection of models considered in the sampling 
 for(wENSO in c(T,F)){
   #load data
-  speclist_smoothed_tbb <- readRDS("data/global_mean_spectra.Rds")
-
+  speclist_smoothed_tbb <- readRDS("data/global_mean_spectra.Rds") 
   obs <- c(signal_tbb %>% filter(type=="obs"))$signal
 
   #define weights

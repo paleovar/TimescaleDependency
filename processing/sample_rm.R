@@ -53,5 +53,5 @@ specs <- lapply(recons, function(x) apply(x, 2, s))
 
 samples$recons <- specs
 
-rn(specs, recons, recons.folder, experiment.names, em.ref, em, filename)
+rm(specs, recons, recons.folder, experiment.names, em.ref, em, filename)
 gc()

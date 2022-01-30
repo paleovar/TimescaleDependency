@@ -2,6 +2,9 @@ source("processing/init_processing.R")
 source("helpers/functions.R")
 source("processing/functions_processing.R")
 library(purrr)
+save <- T
+scale = "cen"
+warm_cutoff <- F
 
 #initialization
 results <- list()
@@ -67,17 +70,17 @@ results <- tmp
 
 pages_meta_scaling <- readRDS("data/pages_meta_scaling.Rds")  %>% select(-Elev_masl, -Proxy) %>% rename(long=Lon, lat=Lat)
 
-bilint_scalingcoeff <- readRDS("processing/bilint_scalingcoeff.Rds")
-
 results <- results %>% left_join(., pages_meta_scaling) %>% add_column(signal="pages2k") %>% select(-compslopes) %>% 
     mutate(slopesd_new = ifelse(signal=="pages2k", sqrt(slopesd**2+diffs**2), slopesd)) %>% 
     select(-diffs) 
 
+
 bilint_scalingcoeff <- readRDS("processing/bilint_scalingcoeff.Rds") %>% add_column(Archive="model") %>% 
- left_join(., pages_meta_scaling %>% select(-Archive)) %>% mutate(slopesd_new = slopesd) 
+  left_join(., pages_meta_scaling %>% select(-Archive)) %>% mutate(slopesd_new = slopesd) 
 
-beta_N <- rbind(bilint_scalingcoeff , results) %>% add_column(cutoff=cut_time, scale=scale)
 
-if(save)[
-  saveRDS(beta_N, paste0("data/beta_", N,".Rds"))
-]
+beta_N <- rbind(bilint_scalingcoeff , results) %>% add_column(cutoff=cut_time, scale=scale) %>% mutate(Archive=replace(Archive, Archive=="hybrid", "borehole")) %>% 
+  mutate(Archive=replace(Archive, Archive=="lake sediment", "lake/marine sediment")) %>% 
+  mutate(Archive=replace(Archive, Archive=="marine sediment", "lake/marine sediment")) 
+
+if(save){saveRDS(beta_N, paste0("data/beta_N", N,".Rds"))}

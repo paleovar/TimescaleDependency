@@ -6,12 +6,14 @@ AOD_convert = 20
 k = 3
 nw = 2
 df.log = 0.02
+save <- F
 
 vol <- summary %>% filter(unit=="AOD") %>% unnest(data) %>% mutate(val =  val*(-AOD_convert), unit="abs dR") %>% group_by(Name, forcing, unit, label) %>% nest() %>% ungroup()
 
 co2 <- summary %>% filter(Name=="co2") %>% unnest(data) %>% mutate(val = 5.35*log(val/278), unit="abs dR") %>% group_by(Name, forcing, unit, label) %>% nest() %>% ungroup()
  
-summary <- rbind(summary, vol, co2) %>% unnest(data) %>% rename(dR=val) %>% group_by(Name, forcing, unit, label) %>% nest() %>% ungroup()
+summary <- rbind(summary, vol, co2) %>% unnest(data) %>% rename(dR=val) %>% 
+group_by(Name, forcing, unit, label) %>% nest() %>% ungroup()
 
 spec_sel <- summary %>% mutate(interp.res = as.numeric(purrr::map(data, ~mean(diff(.$time))))) %>% filter(!Name=="ghg_ml") %>%
   filter(unit %in% c("abs dR", "anom dR"), !Name %in% c("lu", "insol")) %>% equidistant() %>% tibble_spec(., k, nw) %>% select(forcing, Name, interp.res, Spec)
@@ -47,8 +49,9 @@ spec_sel_list$meansol <- cut(means$sol, 1000, 0.01)
 spec_sel_list$meanco2 <- means$co2
 spec_sel_list$meanvol <- means$vol
 
-forc_speclist_smoothed <- lapply(spec_sel_list, function(x) 
-LogSmooth(x, df=2*df.log))
+#choose the logsmoothing here:
+forc_speclist_smoothed <- lapply(spec_sel_list, function(x) LogSmooth(x, df=df.log))
+
 forc_speclist_smoothed$meanvol <- cut(forc_speclist_smoothed$meanvol, 500, 0.1)
 forc_speclist_smoothed$vol_cro <- cut(forc_speclist_smoothed$vol_cro, 1000, 0.08)
 forc_speclist_smoothed$toohey <- cut(forc_speclist_smoothed$toohey, 1000, 0.2)
@@ -57,13 +60,15 @@ forc_speclist_smoothed$meanco2 <- cut(forc_speclist_smoothed$meanco2, 1500, 0.00
 forc_speclist_smoothed$meansol <- cut(forc_speclist_smoothed$meansol, 1000, 0.012)
 
 forc_speclist_smoothed_tbb <- list_to_tibble(forc_speclist_smoothed) %>% rename(Name=model) 
-if(save){saveRDS(forc_speclist_smoothed_tbb, "data/forcing_spectra.Rds"))}
+forc_speclist_smoothed_tbb <- left_join(forc_speclist_smoothed_tbb, readRDS("data/forcing_tbb.Rds") %>% select(-data, -unit))
+forc_speclist_smoothed_tbb <- forc_speclist_smoothed_tbb %>% mutate(forcing = case_when(is.na(forcing) ~Name, TRUE ~forcing))
+if(save){saveRDS(forc_speclist_smoothed_tbb, "data/forcing_spectra.Rds")}
 
 source("processing/insol.R")
 forc_speclist_smoothed <- list()
 forc_speclist_smoothed$Berger78 <- result %>% AddConfInterval()
 forc_speclist_smoothed_tbb <- list_to_tibble(forc_speclist_smoothed) %>% rename(Name=model) 
 if(save){
-  saveRDS(forc_speclist_smoothed_tbb %>% unnest(data) %>% filter(freq >= 200) %>% group_by(Name) %>% nest(), "data/forcing_orb_shortterm_spectra.Rds")
-  saveRDS(forc_speclist_smoothed_tbb %>% unnest(data) %>% filter(freq <= 10) %>% group_by(Name) %>% nest(), "data/forcing_orb_longterm_spectra.Rds")
+  saveRDS(forc_speclist_smoothed_tbb %>% unnest(data) %>% filter(freq >= 200) %>%  group_by(Name) %>% nest() %>% mutate(forcing=Name), "data/forcing_orb_shortterm_spectra.Rds")
+  saveRDS(forc_speclist_smoothed_tbb %>% unnest(data) %>% filter(freq <= 10) %>% group_by(Name) %>% nest() %>% mutate(forcing=Name), "data/forcing_orb_longterm_spectra.Rds")
 }

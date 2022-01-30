@@ -3,10 +3,12 @@ source("helpers/functions.R")
 source("processing/functions_processing.R")
 library(fields)
 warm_cutoff = F
+#cut_time <- 1850
 scale = "cen"
 scaling <- list()
+save <- F
 
-#be careful running this code, it might require up to 30 GB free memory
+#be careful running this code, it might require up to 30 GB free memory, especially for IPSL
 for(n in c(signal_tbb %>% filter(type=="model"))$signal){
   summary <- readRDS(paste0("processing/raw_data/", n, ".Rds"))
 
@@ -15,8 +17,8 @@ for(n in c(signal_tbb %>% filter(type=="model"))$signal){
   }
   
   if(warm_cutoff){
-    summary$temp <- summary$temp[,, index(summary$time[summary$time < warm_cutoff])]
-    summary$time <- summary$time[summary$time < warm_cutoff]
+    summary$temp <- summary$temp[,, index(summary$time[summary$time < cut_time])]
+    summary$time <- summary$time[summary$time < cut_time]
   }
   print(n)
   
@@ -28,7 +30,7 @@ for(n in c(signal_tbb %>% filter(type=="model"))$signal){
   min.res = get_min.res(tscale[[scale]])
   min.range = get_min.range(tscale[[scale]])
   max.hiat = get_max.hiat(tscale[[scale]])
-  pages.meta <- readRDS("data/pages_meta_scaling.Rds")
+  pages.meta <- readRDS("data/pages_meta_scaling.Rds") #to generate this file run the `get proxies` part of "get_scaling_tbb.Rds"
   if((length(which(summary$lon < 0))>1)==FALSE){pages.meta <- pages.meta %>% mutate(Lon = case_when(Lon < 0 ~ Lon + 360, TRUE ~ Lon))}
    sim_data <- zoo(t(apply(summary$temp, 3, function(data_tmp){
       fields::interp.surface(list(x=summary$lon, y=summary$lat, z=data_tmp), data.frame(x=pages.meta$Lon, y=pages.meta$Lat))
@@ -50,6 +52,6 @@ tbb <- tibble()
 for(n in names(scaling)){
   tbb <- rbind(tbb, list_to_tibble(scaling[[n]]) %>% unnest(data) %>% add_column(signal=n))
 }
-if(save){
-  saveRDS(tbb %>% rename(Name=model), "processing/bilint_scalingcoeff.Rds")
-}
+
+saveRDS(tbb %>% rename(Name=model), "processing/bilint_scalingcoeff.Rds")
+

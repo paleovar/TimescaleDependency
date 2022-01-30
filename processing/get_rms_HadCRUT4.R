@@ -3,6 +3,7 @@ if(!exists("RMST")){
 }
 
 #load data
+#please download the "HadCRUT.4.6.0.0.anomalies.1.nc" dataset from https://www.metoffice.gov.uk/hadobs/hadcrut4/data/current/download.html into the `./processing/raw_data` directory. 
 ncf <- ncdf4::nc_open("processing/raw_data/HadCRUT.4.6.0.0.anomalies.1.nc")
 
 #get variable
@@ -53,15 +54,12 @@ coverage <- function(min.len, dat){
   return(list("coords_list"=result1, "temp_list"=result2))
 }
 
-seq(1:length(1:10))/12
-
 min.length <- 12*hadcrut.len
 result <- coverage(min.length, dat)
-length(result$temp_list)
 
-if(save){
-    saveRDS(coords_list, paste0("processing/raw_data/coords/coords_HadCRUT4_len", hadcrut.len, ".Rds"))
-}
+#if(save){
+#    saveRDS(result$coords_list, paste0("processing/raw_data/coords/coords_HadCRUT4_len", hadcrut.len, ".Rds"))
+#}
 
 lats <- unlist(lapply(result$coords_list, function(x) x[2]))
 w.lats <- cos(lats*pi/180)/sum(cos(lats*pi/180))

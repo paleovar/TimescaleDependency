@@ -102,8 +102,15 @@ for(transfertarget in c("forc", "models_woENSO", "models_wENSO", "recons")){
 
 N_sample <- 50 #be carful with changing this parameter. It requires a lot of computing time to go to a larger number of samples
 sample_transfer <- list()
+
+resp_recons2 <- list()
+resp_recons2$ERA5 <- tibble_to_list(readRDS("data/global_mean_spectra.Rds") %>% filter(signal=="ERA5"), name.data="data")[[1]]
+resp_recons2$ERA5 <- cut(resp_recons2$ERA5, from=5, to=length(resp_recons2$ERA5$freq), index=TRUE)
+resp_recons2$hadCRUT <-  tibble_to_list(readRDS("data/global_mean_spectra.Rds") %>% filter(signal=="hadCRUT4"), name.data="data")[[1]]
+resp_recons2$hadCRUT <- cut(resp_recons2$hadCRUT, from=13, to=length(resp_recons2$hadCRUT$freq), index=TRUE)
+
 #SPECTRA
-for(transfertarget in c("recons", "models_woENSO", "models_wENSO")){
+for(transfertarget in c("recons", "models_woENSO", "models_wENSO")){ 
     l <- list()
     print(transfertarget)
     for(i in 1:N_sample){
@@ -160,6 +167,6 @@ sample_transfer <- bind_rows(lapply(names(sample_transfer), function(x){
     ))
 
 if(save){
-    saveRDS(sample_raw, paste0("data/transfer_", N_sample, ".Rds"))
-    saveRDS(sample_transfer, paste0("data/sample_spec_", N_sample, ".Rds"))
+    saveRDS(sample_transfer, paste0("data/transfer_", N_sample, ".Rds"))
+    saveRDS(sample_raw, paste0("data/sample_spec_", N_sample, ".Rds"))
 }

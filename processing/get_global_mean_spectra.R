@@ -53,5 +53,5 @@ speclist_smoothed_tbb <- list_to_tibble(speclist_smoothed)
 
 #save global mean spectra
 if(save){
-    saveRDS(speclist_smoothed_tbb, "data/global_mean_spectra.Rds") #!be careful with overwriting the original files
+    saveRDS(speclist_smoothed_tbb %>% rename(signal=model) %>% mutate(signal=case_when(signal=="hadCRUT" ~"hadCRUT4", TRUE ~signal)), "data/global_mean_spectra.Rds") #!be careful with overwriting the original files
 }

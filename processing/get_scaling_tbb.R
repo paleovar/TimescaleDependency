@@ -5,7 +5,7 @@ scaling <- list()
 coord <- list()
 save <- F #!be careful with overwriting the original files
 
-get_proxies <- T
+get_proxies <- F
 cut <- F
 cut_time <- 2020
 
@@ -21,7 +21,7 @@ if(get_proxies){
     if(save){#!be careful with overwriting the original files
       saveRDS(prxlist, "data/proxylist.Rds")
       saveRDS(pages.meta, "data/pages_meta_scaling.Rds")
-      saveRDS(prxtbbspec %>% select(-data, -EquiTs), "data/proxy_spectra.Rds")
+      saveRDS(prxtbbspec %>% select(-data), "data/proxy_spectra.Rds")
     }
     rm(min.res, min.range, max.hiat, RMST, w.lats)
     specs <- prxtbbspec %>% select(Name, Lon, Lat, Archive, Proxy, interp.res, Spec)
@@ -50,13 +50,15 @@ if(get_proxies){
 
 #model parameters
 meta.res_tbb <- readRDS("helpers/meta_res.Rds")
-signal <- signal_tbb %>% filter(type=="model") %>% select(signal)
+signal <- signal_tbb %>% filter(type=="model") %>% select(signal) 
 
 #compute local mean spectra for specific simulation (i)
-i <- 4 #CHOOSE DATA SETS HERE (calculation can require substantial memory and computing power)
-for(n in signal[i,]){
+i <- seq(1,length(signal$signal),1) #CHOOSE DATA SETS HERE (calculation can require substantial memory and computing power)
+for(n in signal[i,]$signal){
     n <- as.character(n)
-    if(n %in% c("hadCRUT4", "pages2k")){next} 
+    if(n %in% signal_tbb$signal[which(grepl("highres",signal_tbb$signal))]){
+      next
+    }
     print(n)
 
     summary <- readRDS(paste0("processing/raw_data/", n, ".Rds"))
@@ -67,17 +69,22 @@ for(n in signal[i,]){
     
     specs <- list()
     #compute local spectra
-    for(i in 1:dim(coords)[1]){
-        if(i%%100==0){print(i)}
+    print("specs")
+    for(i in 1:dim(coords)[1]){ 
+        if(i%%100==0){
+          print(i)}
         specs[[i]] <- SpecMTM(MakeEquidistant(summary$time, summary$temp[coords[i,]$lon, coords[i,]$lat, ]-mean(summary$temp[coords[i,]$lon, coords[i,]$lat, ]), dt = res), k=k, nw=nw, detrend=TRUE)
         }
     rm(summary)
     gc()
     #compute scaling coefficients
+    print("fits")
     for(i in 1:dim(coords)[1]){
-        print(i)
         fit <- SlopeFit(specs[[i]], 1/max(tscale[[scale]]), 1/min(tscale[[scale]]), bDebug=F)
-        if(i %in% seq(0, 100000, 100)){fit <- SlopeFit(specs[[i]], 1/max(tscale[[scale]]), 1/min(tscale[[scale]]), bDebug=T)}
+        if(i %in% seq(0, 100000, 100)){
+          print(i)
+          fit <- SlopeFit(specs[[i]], 1/max(tscale[[scale]]), 1/min(tscale[[scale]]), bDebug=T)
+          }
         scaling[[n]][[i]] <- list(slope=fit$slope, slopesd=fit$slopesd)
         rm(fit)
       }
@@ -87,4 +94,4 @@ for(n in signal[i,]){
 scaling_tbb <- scaling_to_list(scaling, coord, scale)
 
 #once the above for loop was carried out for all i in "signal", the tibble can be saved as
-#saveRDS(scaling_tbb, "data/scaling_tbb.Rds") !be careful with overwriting the original file
+if(save){saveRDS(scaling_tbb, "data/scaling_tbb.Rds")}# !be careful with overwriting the original file

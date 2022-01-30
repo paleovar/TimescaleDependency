@@ -92,7 +92,7 @@ stopCluster(myCluster)
 res <- rbind(res_lr %>% add_column("method"= "LR"), res_mle_Rlaw %>% add_column("method"= "MLE_Rlaw"))
 
 if(save){
-  saveRDS(res, paste0("data/supp/lr_mle_comp_N=",N, "_samples", samples,".Rds"))
+  saveRDS(res, paste0("data/supp/lr_mle_comp_N",N, "_samples", samples,".Rds"))
 }
 
 #### Case 2: Irregular data ("data/supp/lr_mle_comp_beta_irr_N",N, ".Rds")
